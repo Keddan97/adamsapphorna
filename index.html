@@ -191,6 +191,7 @@
 
   /* KEYBOARD HINT */
   .keyboard-hint { font-size:0.74rem; color:var(--ink2); margin-bottom:20px; opacity:0.65; text-align:center; }
+  @media (max-width: 768px) { .keyboard-hint { display:none; } }
 
   /* QUIZ */
   .quiz-question {
@@ -398,6 +399,8 @@ function showAppScreen() {
   const kats=["Alla",...new Set(nivaFragor.map(f=>f.kategori).filter(Boolean))];
   const filterHTML=kats.map(k=>`<button class="cat-btn${k==="Alla"?" active":""}" onclick="selectKat('${k}')">${k}</button>`).join("");
   const challengeBanner=isChallengeMode?`<div class="challenge-banner">⚡ Utmaningsläge — de svåraste begreppen</div>`:"";
+  // Dölj kategorifilter i utmaningsläge
+  const filterVisible=!isChallengeMode;
 
   // I utmaningsläge: bara quiz. Annars: flashcard + quiz
   const modeHTML = isChallengeMode
@@ -411,7 +414,7 @@ function showAppScreen() {
     <button class="back-btn" onclick="showNivaScreen()">← Tillbaka</button>
     ${challengeBanner}
     ${modeHTML}
-    <div class="filter-bar" id="filterBar">${filterHTML}</div>
+    ${filterVisible ? `<div class="filter-bar" id="filterBar">${filterHTML}</div>` : ""}
     <div id="app"></div>
     <div class="sending" id="sendingMsg" style="display:none">Sparar resultat…</div>`;
 
@@ -444,7 +447,7 @@ function setMode(m) {
 function renderCurrent() {
   const app=document.getElementById("app");
   if(!app) return;
-  if(filteredFragor.length===0){app.innerHTML=`<div class="status">Inga begrepp i den här kategorin.</div>`;return;}
+  if(filteredFragor.length===0){app.innerHTML=`<div class="status">Inga begrepp i den här kategorin.<br><br><button class="done-btn secondary" style="margin-top:8px" onclick="showNivaScreen()">← Tillbaka</button></div>`;return;}
   if(currentIndex>=filteredFragor.length){renderDone();return;}
   mode==="flashcard"?renderFlashcard():renderQuiz();
 }
@@ -492,8 +495,7 @@ function fcSvar(result){
   // true=kunde, null=osäker, false=visste inte
   // Alla tre loggar och går vidare — ingen adaptiv kö
   const f=filteredFragor[currentIndex];
-  if(result===true)  logStat(f.begrepp,true);
-  else               logStat(f.begrepp,false);
+  logStat(f.begrepp, result); // true=kunde, null=osäker, false=visste inte
   currentIndex++;
   renderCurrent();
 }
@@ -555,14 +557,15 @@ function renderDone(){
   sparaResultat();
 }
 
-function logStat(b,r){if(!sessionStats[b])sessionStats[b]={ratt:0,fel:0};if(r)sessionStats[b].ratt++;else sessionStats[b].fel++;}
+function logStat(b,r){if(!sessionStats[b])sessionStats[b]={ratt:0,fel:0,osaker:0};if(r===true)sessionStats[b].ratt++;else if(r===null)sessionStats[b].osaker++;else sessionStats[b].fel++;}
 
 async function sparaResultat(){
   // Slå upp kategori per begrepp från nivaFragor
   const begreppKat={};
   nivaFragor.forEach(f=>{begreppKat[f.begrepp]=f.kategori||"";});
   const res=Object.entries(sessionStats).map(([b,s])=>({
-    begrepp:b, niva:selectedNiva||"", kategori:begreppKat[b]||"", ratt:s.ratt, fel:s.fel
+    begrepp:b, niva:selectedNiva||"", kategori:begreppKat[b]||"",
+    ratt:s.ratt, fel:s.fel+(s.osaker||0) // osäker räknas som fel i statistiken
   }));
   if(!res.length)return;
   const sm=document.getElementById("sendingMsg"); if(sm)sm.style.display="block";
