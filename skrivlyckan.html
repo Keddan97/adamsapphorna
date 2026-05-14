@@ -1,0 +1,488 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+
+.root{
+  font-family:'Nunito',sans-serif;
+  background:#1a0828;
+  border-radius:16px;
+  overflow:hidden;
+  position:relative;
+}
+
+.casino-room{
+  position:relative;
+  width:100%;
+  height:560px;
+  overflow:hidden;
+}
+
+.ceiling{
+  position:absolute;
+  top:0;left:0;right:0;
+  height:52px;
+  background:#0d0518;
+  border-bottom:3px solid #8B6914;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  justify-content:space-around;
+  padding:0 20px;
+}
+.pend-lamp{display:flex;flex-direction:column;align-items:center;}
+.lamp-cord{width:2px;height:18px;background:#555;}
+.lamp-shade{width:24px;height:15px;background:#e8c840;border-radius:0 0 12px 12px;border:2px solid #b8980a;}
+.lamp-glow{width:32px;height:10px;background:rgba(255,220,80,0.22);border-radius:50%;margin-top:-2px;}
+
+.wall-left{position:absolute;top:52px;left:0;width:50%;height:calc(100% - 52px);background:#7a1025;z-index:1;}
+.wall-right{position:absolute;top:52px;right:0;width:50%;height:calc(100% - 52px);background:#7a1025;z-index:1;}
+.wall-center{position:absolute;top:52px;left:18%;right:18%;height:calc(100% - 52px);background:#3d0a5e;z-index:1;}
+
+.wall-deco{
+  position:absolute;
+  top:80px;
+  width:80px;height:60px;
+  background:#5a0d1e;
+  border:3px solid #a07800;
+  border-radius:4px;
+  z-index:2;
+}
+.wall-deco.left{left:20px;}
+.wall-deco.right{right:20px;}
+.wall-deco-inner{width:100%;height:100%;background:#3d0818;border-radius:2px;display:flex;align-items:center;justify-content:center;}
+.wall-deco-inner span{font-family:'Fredoka One',cursive;font-size:11px;color:#FFD700;opacity:0.6;letter-spacing:1px;}
+
+.floor{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:120px;
+  background:repeating-linear-gradient(90deg,#8B0020 0px,#8B0020 38px,#a0001e 38px,#a0001e 40px);
+  z-index:2;
+  border-top:4px solid #FFD700;
+}
+.floor-lines{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent 0px,transparent 28px,rgba(0,0,0,0.25) 28px,rgba(0,0,0,0.25) 30px);
+}
+
+.main-wrap{
+  position:absolute;
+  bottom:90px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+  display:flex;
+  align-items:flex-end;
+}
+
+.main-machine{
+  width:360px;
+  background:#2d0a5e;
+  border-radius:26px 26px 12px 12px;
+  border:5px solid #FFD700;
+  padding:14px 14px 12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:9px;
+  position:relative;
+}
+
+.mm-top{
+  width:100%;
+  background:#FF2D78;
+  border-radius:12px;
+  border:3px solid #FFD700;
+  padding:8px 0;
+  text-align:center;
+}
+.mm-top span{
+  font-family:'Fredoka One',cursive;
+  font-size:30px;
+  color:#FFD700;
+  text-shadow:3px 3px 0 #8B0000;
+  letter-spacing:2px;
+}
+
+.bulbs-row{display:flex;gap:6px;justify-content:center;width:100%;}
+.bulb{width:13px;height:13px;border-radius:50%;background:#222;border:1.5px solid #111;transition:background 0.08s,border-color 0.08s;}
+.br{background:#FF2D78;border-color:#FF88AA;}
+.by{background:#FFD700;border-color:#FFE96A;}
+.bg{background:#00FF88;border-color:#88FFcc;}
+.bb{background:#00BFFF;border-color:#88DDFF;}
+
+.reels-box{
+  width:100%;
+  background:#06001a;
+  border:3px solid #FFD700;
+  border-radius:14px;
+  padding:10px 8px 8px;
+}
+.reel-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:5px;}
+.rlbl{font-family:'Fredoka One',cursive;font-size:9px;color:#FFD700;text-align:center;letter-spacing:0.3px;}
+.reels-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;position:relative;}
+.win-line{
+  position:absolute;left:0;right:0;
+  top:calc(34px + 1px);
+  height:2px;background:#FF2D78;opacity:0.85;z-index:5;pointer-events:none;
+}
+
+.rw{
+  background:#03000f;
+  border:2px solid #3a1a6e;
+  border-radius:8px;
+  overflow:hidden;
+  transition:border-color 0.2s;
+}
+.rw.landed{border-color:#FFD700;}
+
+.rc{
+  height:34px;
+  display:flex;align-items:center;justify-content:center;
+  padding:1px 3px;text-align:center;
+  font-family:'Nunito',sans-serif;
+  font-size:9px;font-weight:700;
+  color:#5a3a90;line-height:1.2;
+  border-bottom:1px solid #0d0030;
+}
+.rc:last-child{border-bottom:none;}
+.rc.win{background:#FFD700;color:#1a0a2e;font-size:10px;font-weight:900;height:44px;}
+.rc.dim{height:26px;opacity:0.5;}
+.spinning .rc{animation:flicker 0.07s steps(1) infinite;}
+@keyframes flicker{0%{opacity:0.15;}50%{opacity:0.7;}100%{opacity:0.15;}}
+
+.mm-base{
+  width:372px;height:24px;
+  background:#1a0540;
+  border-radius:0 0 16px 16px;
+  border:5px solid #FFD700;border-top:none;
+}
+
+.lever-outer{
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;user-select:none;
+  position:absolute;right:-62px;bottom:16px;gap:4px;
+}
+.lev-shaft{
+  width:20px;height:130px;
+  background:#999;border-radius:10px;border:2px solid #666;
+  position:relative;display:flex;align-items:center;justify-content:center;
+}
+.lev-inner{width:7px;height:100%;background:#bbb;border-radius:3px;}
+.lev-arm{
+  width:18px;height:95px;
+  background:#d8d8d8;border-radius:9px;border:2px solid #999;
+  position:absolute;top:5px;left:1px;
+  transform-origin:bottom center;
+  transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+.lev-ball{
+  width:34px;height:34px;background:#FF2D78;border-radius:50%;border:3px solid #FFD700;
+  position:absolute;top:-18px;left:-9px;
+}
+.lev-ball::after{content:'';width:9px;height:9px;background:rgba(255,255,255,0.55);border-radius:50%;position:absolute;top:5px;left:5px;}
+.lever-outer.pulled .lev-arm{transform:rotate(44deg);}
+.lev-lbl{font-family:'Fredoka One',cursive;font-size:12px;color:#FFD700;text-align:center;text-shadow:1px 1px 0 #8B0000;line-height:1.2;}
+
+/* JACKPOT overlay */
+.jackpot-overlay{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:50;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:8px;
+  background:rgba(10,0,30,0.55);
+}
+.jackpot-overlay.show{display:flex;}
+
+.jackpot-text{
+  font-family:'Fredoka One',cursive;
+  font-size:72px;
+  color:#FFD700;
+  text-shadow:
+    0 0 20px #FFD700,
+    0 0 40px #FF8C00,
+    4px 4px 0 #8B0000,
+    8px 8px 0 #4a0000;
+  animation:jbounce 0.35s infinite alternate;
+  letter-spacing:4px;
+}
+@keyframes jbounce{
+  0%{transform:scale(1) rotate(-2deg);}
+  100%{transform:scale(1.12) rotate(2deg);}
+}
+
+.jackpot-sub{
+  font-family:'Fredoka One',cursive;
+  font-size:26px;
+  color:#FF2D78;
+  text-shadow:2px 2px 0 #4a0018, 0 0 15px #FF2D78;
+  animation:jbounce2 0.5s infinite alternate;
+  letter-spacing:2px;
+}
+@keyframes jbounce2{
+  0%{transform:scale(0.95);}
+  100%{transform:scale(1.05);}
+}
+
+.coins-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:60;}
+.coin{
+  position:absolute;width:18px;height:18px;background:#FFD700;border-radius:50%;
+  border:2px solid #B8860B;font-family:'Nunito',sans-serif;font-size:8px;font-weight:900;color:#8B6914;
+  display:flex;align-items:center;justify-content:center;
+  animation:cf linear forwards;
+}
+@keyframes cf{
+  0%{transform:translateY(0) rotate(0deg);opacity:1;}
+  80%{opacity:1;}
+  100%{transform:translateY(600px) rotate(720deg);opacity:0;}
+}
+
+.prompt-wrap{padding:0 16px 18px;display:none;}
+.prompt-wrap.vis{display:block;}
+.prompt-card{background:#2d0a5e;border:3px solid #FFD700;border-radius:14px;padding:16px 20px;}
+.p-lbl{font-family:'Fredoka One',cursive;font-size:14px;color:#FF2D78;letter-spacing:1px;margin-bottom:6px;}
+.p-txt{font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:#e0d0ff;line-height:1.65;}
+.p-txt strong{color:#FFD700;}
+</style>
+
+<div class="root" id="root">
+  <h2 class="sr-only">Skrivlyckan — kasinomaskin för kreativa skrivuppgifter</h2>
+  <div class="coins-layer" id="coinsLayer"></div>
+
+  <div class="casino-room">
+    <div class="jackpot-overlay" id="jackpotOverlay">
+      <div class="jackpot-text">JACKPOT!</div>
+      <div class="jackpot-sub">DIN UPPGIFT VÄNTAR...</div>
+    </div>
+
+    <div class="ceiling">
+      <div class="pend-lamp"><div class="lamp-cord"></div><div class="lamp-shade"></div><div class="lamp-glow"></div></div>
+      <div class="pend-lamp"><div class="lamp-cord"></div><div class="lamp-shade"></div><div class="lamp-glow"></div></div>
+      <div class="pend-lamp"><div class="lamp-cord"></div><div class="lamp-shade"></div><div class="lamp-glow"></div></div>
+      <div class="pend-lamp"><div class="lamp-cord"></div><div class="lamp-shade"></div><div class="lamp-glow"></div></div>
+      <div class="pend-lamp"><div class="lamp-cord"></div><div class="lamp-shade"></div><div class="lamp-glow"></div></div>
+      <div class="pend-lamp"><div class="lamp-cord"></div><div class="lamp-shade"></div><div class="lamp-glow"></div></div>
+      <div class="pend-lamp"><div class="lamp-cord"></div><div class="lamp-shade"></div><div class="lamp-glow"></div></div>
+    </div>
+
+    <div class="wall-left"></div>
+    <div class="wall-right"></div>
+    <div class="wall-center"></div>
+
+    <div class="wall-deco left"><div class="wall-deco-inner"><span>CASINO</span></div></div>
+    <div class="wall-deco right"><div class="wall-deco-inner"><span>LUCKY</span></div></div>
+
+    <div class="floor"><div class="floor-lines"></div></div>
+
+    <div class="main-wrap">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="main-machine" id="mainMachine">
+          <div class="mm-top"><span>SKRIVLYCKAN</span></div>
+
+          <div class="bulbs-row">
+            <div class="bulb" id="b0"></div><div class="bulb" id="b1"></div><div class="bulb" id="b2"></div>
+            <div class="bulb" id="b3"></div><div class="bulb" id="b4"></div><div class="bulb" id="b5"></div>
+            <div class="bulb" id="b6"></div><div class="bulb" id="b7"></div><div class="bulb" id="b8"></div><div class="bulb" id="b9"></div>
+          </div>
+
+          <div class="reels-box">
+            <div class="reel-labels">
+              <div class="rlbl">Karaktär</div>
+              <div class="rlbl">Karaktärsdrag</div>
+              <div class="rlbl">Miljö</div>
+              <div class="rlbl">Konflikt</div>
+            </div>
+            <div class="reels-grid">
+              <div class="win-line"></div>
+              <div class="rw" id="rw0"><div class="rc dim" id="r0-0"></div><div class="rc win" id="r0-1"></div><div class="rc dim" id="r0-2"></div></div>
+              <div class="rw" id="rw1"><div class="rc dim" id="r1-0"></div><div class="rc win" id="r1-1"></div><div class="rc dim" id="r1-2"></div></div>
+              <div class="rw" id="rw2"><div class="rc dim" id="r2-0"></div><div class="rc win" id="r2-1"></div><div class="rc dim" id="r2-2"></div></div>
+              <div class="rw" id="rw3"><div class="rc dim" id="r3-0"></div><div class="rc win" id="r3-1"></div><div class="rc dim" id="r3-2"></div></div>
+            </div>
+          </div>
+
+          <div class="bulbs-row">
+            <div class="bulb" id="b10"></div><div class="bulb" id="b11"></div><div class="bulb" id="b12"></div>
+            <div class="bulb" id="b13"></div><div class="bulb" id="b14"></div><div class="bulb" id="b15"></div>
+            <div class="bulb" id="b16"></div><div class="bulb" id="b17"></div><div class="bulb" id="b18"></div><div class="bulb" id="b19"></div>
+          </div>
+
+          <div class="lever-outer" id="leverOuter" onclick="handleLever()">
+            <div class="lev-shaft">
+              <div class="lev-inner"></div>
+              <div class="lev-arm" id="levArm"><div class="lev-ball"></div></div>
+            </div>
+            <div class="lev-lbl">DRA<br>HÄR</div>
+          </div>
+        </div>
+        <div class="mm-base"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="prompt-wrap" id="promptWrap">
+    <div class="prompt-card">
+      <div class="p-lbl">Din skrivuppgift</div>
+      <div class="p-txt" id="pTxt"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA=[
+  ["Utomjording","Hemlig agent","Influencer","Riddare","Robot","Bibliotekarie","Pirat","Förskollärare","Superhjälte","Detektiv","Spökskrivare","Diktator","Elitidrottare","Rymdfarare","Tidsresenär"],
+  ["social fobi","sjösjuk","talar alltid sanning","livrädd för teknik","tror sig vara katt","allergisk mot damm","saknar lokalsinne","kommunicerar via sång","extremt snål","glömt sitt namn","besatt av ordning","ser spöken","mörkrädd","alltid sen","osynlig vän"],
+  ["Ödslig parkeringsplats","Lyxig takvåning","Botten av havet","Skola för magi","Rymdstation","Medeltida fängelse","Zombieapokalyps","Oändlig öken","Tåg som aldrig stannar","Futuristisk djurpark","Öde ö","Rum bakom bokhylla","Molnbaserad stad","Tidsmaskin 1850","Skog av godis"],
+  ["bli vegan","stulit en diamant","håller hemlighet","lagar tidsmaskin","tävlar mot fuskare","tappat passet","överleva utan sömn","imponera på kärlek","bankrån utan vapen","tickande paket","invasion av kaniner","radera mejl","bevisa oskuld","makt eller kärlek","ut ur labyrinten"]
+];
+const FULL_DRAG=["som har social fobi","som är sjösjuk","som alltid talar sanning","som är livrädd för teknik","som tror att hen är en katt","som är allergisk mot damm","som saknar lokalsinne","som bara kommunicerar genom sång","som är extremt snål","som har glömt sitt namn","som är besatt av ordning","som ser spöken","som är mörkrädd","som alltid är sen","som har en osynlig vän"];
+const FULL_KONF=["ska försöka bli vegan","har stulit en diamant","håller en hemlighet","lagar en tidsmaskin","tävlar mot en fuskare","har tappat bort passet","ska överleva utan sömn","vill imponera på sin kärlek","planerar ett bankrån utan vapen","hittar ett tickande paket","invaderas av kaniner","försöker radera ett pinsamt mejl","måste bevisa sin oskuld","väljer mellan makt och kärlek","försöker hitta ut ur en labyrint"];
+
+let indices=[0,0,0,0],spinning=false,lightInt=null,spinIvs=[null,null,null,null],audioCtx=null,lightOff=0;
+
+function mod(n,m){return((n%m)+m)%m;}
+function rnd(arr){return Math.floor(Math.random()*arr.length);}
+function getCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();return audioCtx;}
+
+function tone(freq,type,dur,vol,delay=0){
+  try{
+    const c=getCtx(),o=c.createOscillator(),g=c.createGain();
+    o.connect(g);g.connect(c.destination);
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(0,c.currentTime+delay);
+    g.gain.linearRampToValueAtTime(vol,c.currentTime+delay+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+delay+dur);
+    o.start(c.currentTime+delay);o.stop(c.currentTime+delay+dur+0.05);
+  }catch(e){}
+}
+
+function playRoll(){for(let i=0;i<60;i++)tone(70+Math.random()*180,'sawtooth',0.07,0.07,i*0.04);}
+function playStop(w){const f=[392,440,494,523];tone(f[w],'sine',0.35,0.55);tone(f[w]*1.5,'sine',0.2,0.25,0.05);}
+
+function playWin(){
+  // Bombastic fanfare — layered chords + melody + bass hits
+  const melody=[523,659,784,1047,1319,784,1047,1319,1568,1319,1047,1568];
+  melody.forEach((f,i)=>tone(f,'sine',0.4,0.45,i*0.1));
+  // harmony layer
+  const harm=[659,784,988,1319,1568,988,1319,1568,1976];
+  harm.forEach((f,i)=>tone(f,'triangle',0.35,0.25,i*0.1+0.05));
+  // bass punches
+  [65,65,98,65,98,130].forEach((f,i)=>tone(f,'sawtooth',0.3,0.5,i*0.18));
+  // drum-like noise hits
+  for(let i=0;i<6;i++){
+    setTimeout(()=>{
+      try{
+        const c=getCtx(),buf=c.createBuffer(1,c.sampleRate*0.1,c.sampleRate);
+        const d=buf.getChannelData(0);for(let j=0;j<d.length;j++)d[j]=(Math.random()*2-1);
+        const src=c.createBufferSource(),g=c.createGain();
+        src.buffer=buf;src.connect(g);g.connect(c.destination);
+        g.gain.setValueAtTime(0.4,c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.1);
+        src.start();src.stop(c.currentTime+0.12);
+      }catch(e){}
+    },i*180);
+  }
+}
+
+function playAlert(){[440,550,660,550,440].forEach((f,i)=>tone(f,'square',0.1,0.25,i*0.1));}
+
+const BC=['br','by','bg','bb'];
+function startLights(){
+  clearInterval(lightInt);
+  lightInt=setInterval(()=>{
+    for(let i=0;i<20;i++){const b=document.getElementById('b'+i);if(b)b.className='bulb '+BC[(i+lightOff)%4];}
+    lightOff++;
+  },100);
+}
+function winLights(){
+  clearInterval(lightInt);
+  lightInt=setInterval(()=>{
+    for(let i=0;i<20;i++){const b=document.getElementById('b'+i);if(b)b.className='bulb '+(lightOff%2===0?BC[i%4]:'');}
+    lightOff++;
+  },60);
+}
+function stopLights(){clearInterval(lightInt);for(let i=0;i<20;i++){const b=document.getElementById('b'+i);if(b)b.className='bulb';}}
+
+function setReel(w,ci){
+  const n=DATA[w].length;
+  document.getElementById(`r${w}-0`).textContent=DATA[w][mod(ci-1,n)];
+  document.getElementById(`r${w}-1`).textContent=DATA[w][ci];
+  document.getElementById(`r${w}-2`).textContent=DATA[w][mod(ci+1,n)];
+  indices[w]=ci;
+}
+function spinReel(w){
+  document.getElementById('rw'+w).classList.add('spinning');
+  document.getElementById('rw'+w).classList.remove('landed');
+  spinIvs[w]=setInterval(()=>{
+    const f=rnd(DATA[w]);
+    document.getElementById(`r${w}-0`).textContent=DATA[w][mod(f-1,DATA[w].length)];
+    document.getElementById(`r${w}-1`).textContent=DATA[w][f];
+    document.getElementById(`r${w}-2`).textContent=DATA[w][mod(f+1,DATA[w].length)];
+  },75);
+}
+function stopReel(w,fi,cb){
+  clearInterval(spinIvs[w]);
+  document.getElementById('rw'+w).classList.remove('spinning');
+  document.getElementById('rw'+w).classList.add('landed');
+  setReel(w,fi);playStop(w);
+  if(cb)cb();
+}
+
+function spawnCoins(){
+  const layer=document.getElementById('coinsLayer');
+  const s=['$','€','¥','£'];
+  for(let i=0;i<45;i++){
+    setTimeout(()=>{
+      const c=document.createElement('div');c.className='coin';
+      c.textContent=s[Math.floor(Math.random()*4)];
+      c.style.cssText=`left:${3+Math.random()*94}%;top:${Math.random()*15}%;animation-duration:${0.7+Math.random()*1.1}s;animation-delay:${Math.random()*0.4}s;`;
+      layer.appendChild(c);setTimeout(()=>c.remove(),2800);
+    },i*45);
+  }
+}
+
+function updatePrompt(){
+  const k=DATA[0][indices[0]],d=FULL_DRAG[indices[1]],m=DATA[2][indices[2]],c=FULL_KONF[indices[3]];
+  document.getElementById('promptWrap').classList.add('vis');
+  document.getElementById('pTxt').innerHTML=`Skriv om en <strong>${k}</strong> <strong>${d}</strong>, i miljön <strong>${m}</strong>, som <strong>${c}</strong>.`;
+}
+
+function handleLever(){
+  if(spinning)return;
+  spinning=true;
+  const lw=document.getElementById('leverOuter');
+  lw.classList.add('pulled');playAlert();
+  setTimeout(()=>lw.classList.remove('pulled'),500);
+  document.getElementById('promptWrap').classList.remove('vis');
+  document.getElementById('jackpotOverlay').classList.remove('show');
+
+  const newIdx=DATA.map(arr=>rnd(arr));
+
+  setTimeout(()=>{
+    playRoll();startLights();
+    for(let w=0;w<4;w++)spinReel(w);
+
+    [2000,3100,4200,5300].forEach((t,w)=>{
+      setTimeout(()=>{
+        stopReel(w,newIdx[w],w===3?()=>{
+          spinning=false;
+          stopLights();winLights();playWin();spawnCoins();
+          document.getElementById('jackpotOverlay').classList.add('show');
+          setTimeout(()=>{
+            document.getElementById('jackpotOverlay').classList.remove('show');
+            stopLights();
+            updatePrompt();
+          },3500);
+        }:null);
+      },t);
+    });
+  },550);
+}
+
+for(let w=0;w<4;w++)setReel(w,rnd(DATA[w]));
+updatePrompt();
+</script>
