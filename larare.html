@@ -143,6 +143,18 @@
   .spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px 0;}
   .spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--green-light);border-top-color:var(--green);animation:spin 0.8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
+  .combo-wrap{position:relative;}
+  .combo-input{width:100%;border:1.5px solid var(--border);background:var(--bg);padding:10px 40px 10px 12px;border-radius:10px;font-family:'Source Sans 3',sans-serif;font-size:0.93rem;color:var(--ink);outline:none;transition:border-color 0.15s;}
+  .combo-input:focus{border-color:var(--green);}
+  .combo-arrow{position:absolute;right:0;top:0;bottom:0;width:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);font-size:1rem;border-left:1px solid var(--border);border-radius:0 10px 10px 0;background:var(--card);transition:background 0.15s;}
+  .combo-arrow:hover{background:var(--green-pale);color:var(--green);}
+  .combo-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-radius:10px;z-index:100;max-height:200px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.08);display:none;}
+  .combo-dropdown.open{display:block;}
+  .combo-option{padding:9px 14px;cursor:pointer;font-size:0.92rem;color:var(--ink);transition:background 0.12s;}
+  .combo-option:hover{background:var(--green-pale);color:var(--green);}
+  .combo-option.new-kat{color:var(--orange);font-style:italic;}
+  .cat-filter-btn{border:1.5px solid var(--border);background:var(--card);padding:4px 14px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.82rem;cursor:pointer;color:var(--ink2);transition:all 0.18s;}
+  .cat-filter-btn.active{background:var(--green);border-color:var(--green);color:#fff;}
   .empty-msg{color:var(--ink2);font-size:0.9rem;text-align:center;padding:32px 0;}
   .status-msg{color:var(--ink2);font-size:0.9rem;text-align:center;padding:32px 0;}
 
@@ -183,7 +195,13 @@
         <h3>Lägg till begrepp</h3>
         <div class="form-row">
           <div><label>Begrepp</label><input type="text" id="newBegrepp" placeholder="T.ex. Epik" list="kategoriListB"></div>
-          <div><label>Kategori</label><input type="text" id="newKategori" placeholder="T.ex. Litteratur" list="kategoriList"><datalist id="kategoriList"></datalist></div>
+          <div><label>Kategori</label>
+            <div class="combo-wrap" id="komboNy">
+              <input type="text" class="combo-input" id="newKategori" placeholder="Välj eller skriv ny…" autocomplete="off" oninput="filterKombo('komboNy','newKategori')" onfocus="openKombo('komboNy','newKategori')">
+              <div class="combo-arrow" onclick="toggleKombo('komboNy','newKategori')">&#9660;</div>
+              <div class="combo-dropdown" id="komboNy-dd"></div>
+            </div>
+          </div>
         </div>
         <div class="form-row single"><div><label>Förklaring</label><textarea id="newForklaring" placeholder="Skriv förklaringen här…"></textarea></div></div>
         <div style="display:flex;align-items:center;margin-top:4px;">
@@ -195,6 +213,7 @@
       <div class="card">
         <h3>Befintliga begrepp <span id="begreppCount" style="font-weight:400;color:var(--ink2);font-size:0.88rem;"></span></h3>
         <div class="search-wrap"><input type="text" class="search-input" id="searchInput" placeholder="Sök begrepp…" oninput="renderBegreppList()"></div>
+        <div class="filter-bar" id="katFilter" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
         <div id="begreppList"><div class="spinner-wrap"><div class="spinner"></div></div></div>
       </div>
     </div>
@@ -248,6 +267,7 @@ const API = "https://script.google.com/macros/s/AKfycbxCYp8lS4IXEL-M_ZDrvM3qUHjE
 const PASSWORD = "v\u00e4nligkvartersspindel";
 
 let allFragor=[], allStats={};
+let selectedKat="Alla";
 let selectedBegreppNiva=null, selectedStatNiva=null, selectedImportNiva=null;
 let importData=[];
 
@@ -301,13 +321,28 @@ function showTab(tab) {
 // ---- BEGREPP ----
 function selectBegreppNiva(niva) {
   selectedBegreppNiva=niva;
+  selectedKat="Alla";
   document.querySelectorAll("#begreppLevelSelector .level-btn").forEach(b=>b.classList.toggle("active",b.dataset.niva===niva));
-  renderBegreppList(); updateKategoriList();
+  renderKatFilter(); renderBegreppList(); updateKategoriList();
+}
+
+function renderKatFilter() {
+  const kats=["Alla",...new Set(allFragor.filter(f=>f.niva===selectedBegreppNiva).map(f=>f.kategori).filter(Boolean)).values()].sort();
+  document.getElementById("katFilter").innerHTML=kats.map(k=>
+    `<button class="cat-filter-btn${k===selectedKat?" active":""}" onclick="selectKatFilter('${k.replace(/'/,"\'")}')">${k}</button>`
+  ).join("");
+}
+
+function selectKatFilter(kat) {
+  selectedKat=kat;
+  renderKatFilter();
+  renderBegreppList();
 }
 
 function renderBegreppList() {
   const q=(document.getElementById("searchInput").value||"").toLowerCase();
   let fragor=allFragor.filter(f=>f.niva===selectedBegreppNiva);
+  if(selectedKat!=="Alla") fragor=fragor.filter(f=>f.kategori===selectedKat);
   if(q) fragor=fragor.filter(f=>f.begrepp.toLowerCase().includes(q)||f.forklaring.toLowerCase().includes(q));
   fragor.sort((a,b)=>a.begrepp.localeCompare(b.begrepp,"sv"));
   document.getElementById("begreppCount").textContent=`(${allFragor.filter(f=>f.niva===selectedBegreppNiva).length} begrepp)`;
@@ -328,7 +363,15 @@ function renderBegreppList() {
       <div class="edit-form" id="edit-${esc(f.begrepp)}">
         <div class="edit-row">
           <div><span class="edit-label">Begrepp</span><input type="text" class="edit-input" id="eb-${esc(f.begrepp)}" value="${f.begrepp}"></div>
-          <div><span class="edit-label">Kategori</span><input type="text" class="edit-input" id="ek-${esc(f.begrepp)}" value="${f.kategori||""}" list="kategoriList"></div>
+          <div><span class="edit-label">Kategori</span>
+            <div class="combo-wrap" id="komboEdit-${esc(f.begrepp)}">
+              <input type="text" class="combo-input edit-input" id="ek-${esc(f.begrepp)}" value="${f.kategori||""}" autocomplete="off"
+                oninput="filterKombo('komboEdit-${esc(f.begrepp)}','ek-${esc(f.begrepp)}')"
+                onfocus="openKombo('komboEdit-${esc(f.begrepp)}','ek-${esc(f.begrepp)}')">
+              <div class="combo-arrow" onclick="toggleKombo('komboEdit-${esc(f.begrepp)}','ek-${esc(f.begrepp)}')">&#9660;</div>
+              <div class="combo-dropdown" id="komboEdit-${esc(f.begrepp)}-dd"></div>
+            </div>
+          </div>
         </div>
         <div class="edit-row single"><div><span class="edit-label">Förklaring</span><textarea class="edit-input edit-textarea" id="ef-${esc(f.begrepp)}">${f.forklaring}</textarea></div></div>
         <div class="edit-btns">
@@ -359,15 +402,62 @@ async function sparaEdit(gammaltBegrepp) {
     if(data.ok){
       const idx=allFragor.findIndex(f=>f.begrepp===gammaltBegrepp&&f.niva===selectedBegreppNiva);
       if(idx>-1) allFragor[idx]={begrepp:nyttBegrepp,forklaring:nyttForklaring,kategori:nyttKategori,niva:selectedBegreppNiva};
-      renderBegreppList(); updateKategoriList();
+      renderKatFilter(); renderBegreppList(); updateKategoriList();
     }
   } catch(e){alert("Kunde inte spara. Försök igen.");}
 }
 
-function updateKategoriList(){
-  const kats=[...new Set(allFragor.filter(f=>f.niva===selectedBegreppNiva).map(f=>f.kategori).filter(Boolean))];
-  document.getElementById("kategoriList").innerHTML=kats.map(k=>`<option value="${k}">`).join("");
+function getKats() {
+  return [...new Set(allFragor.filter(f=>f.niva===selectedBegreppNiva).map(f=>f.kategori).filter(Boolean))].sort();
 }
+function updateKategoriList(){ /* behålls för kompatibilitet */ }
+
+function openKombo(wrapId, inputId) {
+  const kats = getKats();
+  const val = document.getElementById(inputId).value.toLowerCase();
+  renderKomboOptions(wrapId, inputId, kats, val);
+  document.getElementById(wrapId+"-dd").classList.add("open");
+}
+
+function toggleKombo(wrapId, inputId) {
+  const dd = document.getElementById(wrapId+"-dd");
+  if(dd.classList.contains("open")) { dd.classList.remove("open"); return; }
+  openKombo(wrapId, inputId);
+}
+
+function filterKombo(wrapId, inputId) {
+  const kats = getKats();
+  const val = document.getElementById(inputId).value.toLowerCase();
+  renderKomboOptions(wrapId, inputId, kats, val);
+  document.getElementById(wrapId+"-dd").classList.add("open");
+}
+
+function renderKomboOptions(wrapId, inputId, kats, filter) {
+  const dd = document.getElementById(wrapId+"-dd");
+  if(!dd) return;
+  const filtered = filter ? kats.filter(k=>k.toLowerCase().includes(filter)) : kats;
+  const inputVal = document.getElementById(inputId).value.trim();
+  let html = filtered.map(k=>
+    `<div class="combo-option" onmousedown="pickKombo('${wrapId}','${inputId}','${k.replace(/'/g,"\'")}')">  ${k}</div>`
+  ).join("");
+  if(inputVal && !kats.some(k=>k.toLowerCase()===inputVal.toLowerCase())) {
+    html += `<div class="combo-option new-kat" onmousedown="pickKombo('${wrapId}','${inputId}','${inputVal.replace(/'/g,"\'")}')">+ Skapa "${inputVal}"</div>`;
+  }
+  if(!html) html = `<div style="padding:9px 14px;font-size:0.88rem;color:var(--ink2);">Inga kategorier ännu</div>`;
+  dd.innerHTML = html;
+}
+
+function pickKombo(wrapId, inputId, val) {
+  document.getElementById(inputId).value = val;
+  document.getElementById(wrapId+"-dd").classList.remove("open");
+}
+
+// Stäng dropdown vid klick utanför
+document.addEventListener("click", e => {
+  document.querySelectorAll(".combo-dropdown.open").forEach(dd => {
+    if(!dd.closest(".combo-wrap").contains(e.target)) dd.classList.remove("open");
+  });
+});
 
 async function laggTillBegrepp(){
   const begrepp=document.getElementById("newBegrepp").value.trim();
@@ -384,7 +474,7 @@ async function laggTillBegrepp(){
       document.getElementById("newBegrepp").value="";
       document.getElementById("newForklaring").value="";
       document.getElementById("newKategori").value="";
-      renderBegreppList(); updateKategoriList();
+      renderKatFilter(); renderBegreppList(); updateKategoriList();
       const msg=document.getElementById("saveMsg"); msg.classList.add("show");
       setTimeout(()=>msg.classList.remove("show"),2500);
     }
@@ -397,7 +487,7 @@ async function taBortBegrepp(begrepp){
   try {
     const res=await fetch(API,{method:"POST",body:JSON.stringify({action:"deleteBegrepp",begrepp,niva:selectedBegreppNiva}),headers:{"Content-Type":"text/plain"}});
     const data=await res.json();
-    if(data.ok){allFragor=allFragor.filter(f=>!(f.begrepp===begrepp&&f.niva===selectedBegreppNiva));renderBegreppList();}
+    if(data.ok){allFragor=allFragor.filter(f=>!(f.begrepp===begrepp&&f.niva===selectedBegreppNiva));renderKatFilter();renderBegreppList();}
   } catch(e){alert("Kunde inte ta bort.");}
 }
 
