@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rymdinvaders</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+  :root { --neon-cyan:#00f5ff; --neon-pink:#ff006e; --neon-yellow:#ffbe0b; --neon-green:#06ffa5; --dark-bg:#03010a; --panel-bg:rgba(0,20,40,0.85); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--dark-bg); color:#fff; font-family:'Share Tech Mono',monospace; overflow:hidden; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  #gameCanvas { display:none; cursor:none; }
+  #startScreen,#reportScreen { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--dark-bg); z-index:10; }
+  #reportScreen { display:none; }
+  .title-main { font-family:'Orbitron',sans-serif; font-size:clamp(2rem,5vw,4rem); font-weight:900; color:var(--neon-cyan); text-shadow:0 0 20px var(--neon-cyan),0 0 40px var(--neon-cyan); letter-spacing:4px; text-align:center; animation:pulseTitle 3s ease-in-out infinite; }
+  .title-sub { font-family:'Orbitron',sans-serif; font-size:clamp(0.9rem,2vw,1.4rem); color:var(--neon-pink); text-shadow:0 0 10px var(--neon-pink); letter-spacing:8px; margin-top:8px; text-align:center; }
+  @keyframes pulseTitle { 0%,100%{text-shadow:0 0 20px var(--neon-cyan),0 0 40px var(--neon-cyan);}50%{text-shadow:0 0 30px var(--neon-cyan),0 0 60px var(--neon-cyan),0 0 100px var(--neon-cyan);} }
+  .sector-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:40px; width:min(700px,90vw); }
+  .sector-btn-ultimate { background:rgba(255,190,11,0.07); border:2px solid var(--neon-yellow); color:var(--neon-yellow); font-family:'Orbitron',sans-serif; font-size:0.9rem; font-weight:700; padding:18px 16px; cursor:pointer; text-transform:uppercase; letter-spacing:3px; transition:all 0.2s; text-align:center; clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px)); width:min(700px,90vw); margin-top:4px; }
+  .sector-btn-ultimate:hover { background:rgba(255,190,11,0.2); box-shadow:0 0 30px var(--neon-yellow),inset 0 0 20px rgba(255,190,11,0.1); transform:translateY(-3px); }
+  .sector-btn { background:var(--panel-bg); border:2px solid var(--neon-cyan); color:var(--neon-cyan); font-family:'Orbitron',sans-serif; font-size:0.85rem; font-weight:700; padding:20px 16px; cursor:pointer; text-transform:uppercase; letter-spacing:2px; transition:all 0.2s; text-align:center; clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px)); }
+  .sector-btn:hover { background:rgba(0,245,255,0.15); box-shadow:0 0 20px var(--neon-cyan),inset 0 0 20px rgba(0,245,255,0.1); transform:translateY(-3px); }
+  .sector-btn .sector-icon { font-size:2rem; display:block; margin-bottom:8px; }
+  .sector-btn .sector-count { font-size:0.65rem; color:rgba(0,245,255,0.6); margin-top:4px; }
+  .neon-btn { background:transparent; border:2px solid var(--neon-pink); color:var(--neon-pink); font-family:'Orbitron',sans-serif; font-size:1rem; font-weight:700; padding:14px 40px; cursor:pointer; text-transform:uppercase; letter-spacing:4px; margin-top:30px; transition:all 0.2s; clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px)); }
+  .neon-btn:hover { background:rgba(255,0,110,0.2); box-shadow:0 0 20px var(--neon-pink); transform:translateY(-2px); }
+  #hud { display:none; position:fixed; top:0; left:0; right:0; z-index:5; padding:10px 20px; background:linear-gradient(to bottom,rgba(0,0,0,0.9) 0%,transparent 100%); pointer-events:none; }
+  #hud.active { display:flex; justify-content:space-between; align-items:center; }
+  .hud-item { font-family:'Orbitron',sans-serif; font-size:0.75rem; color:var(--neon-cyan); text-shadow:0 0 8px var(--neon-cyan); }
+  .hud-score { font-size:1.1rem; font-weight:700; }
+  #questionDisplay { display:none; position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:5; width:min(800px,90vw); background:var(--panel-bg); border:1px solid var(--neon-cyan); border-top:3px solid var(--neon-cyan); padding:14px 20px; text-align:center; font-size:clamp(0.85rem,2vw,1.05rem); color:#fff; pointer-events:none; box-shadow:0 0 20px rgba(0,245,255,0.2); line-height:1.4; }
+  #questionDisplay.active { display:block; }
+  .report-container { width:min(800px,90vw); max-height:80vh; overflow-y:auto; background:var(--panel-bg); border:2px solid var(--neon-cyan); padding:30px; clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px)); }
+  .report-container::-webkit-scrollbar{width:6px;} .report-container::-webkit-scrollbar-track{background:rgba(0,0,0,0.3);} .report-container::-webkit-scrollbar-thumb{background:var(--neon-cyan);}
+  .report-title { font-family:'Orbitron',sans-serif; font-size:1.5rem; color:var(--neon-cyan); text-shadow:0 0 15px var(--neon-cyan); text-align:center; margin-bottom:20px; }
+  .report-stats { display:flex; gap:20px; justify-content:center; margin-bottom:24px; flex-wrap:wrap; }
+  .stat-box { text-align:center; padding:14px 24px; border:1px solid; flex:1; min-width:120px; }
+  .stat-box.correct{border-color:var(--neon-green);color:var(--neon-green);} .stat-box.wrong{border-color:var(--neon-pink);color:var(--neon-pink);} .stat-box.score{border-color:var(--neon-yellow);color:var(--neon-yellow);}
+  .stat-num { font-family:'Orbitron',sans-serif; font-size:2rem; font-weight:900; display:block; }
+  .stat-label { font-size:0.7rem; letter-spacing:2px; margin-top:4px; opacity:0.8; }
+  .missed-title { font-family:'Orbitron',sans-serif; font-size:0.9rem; color:var(--neon-pink); margin-bottom:12px; letter-spacing:2px; border-bottom:1px solid rgba(255,0,110,0.3); padding-bottom:8px; }
+  .missed-item { background:rgba(255,0,110,0.05); border-left:3px solid var(--neon-pink); padding:12px 14px; margin-bottom:10px; font-size:0.85rem; line-height:1.6; }
+  .missed-q{color:var(--neon-yellow);margin-bottom:4px;} .missed-your{color:rgba(255,100,100,0.9);} .missed-correct{color:var(--neon-green);} .missed-explain{color:rgba(200,220,255,0.8);margin-top:6px;font-size:0.8rem;font-style:italic;}
+  .report-footer{text-align:center;margin-top:20px;}
+  .progress-bar-container{width:100%;height:4px;background:rgba(255,255,255,0.1);margin-top:4px;border-radius:2px;overflow:hidden;}
+  .progress-bar-fill{height:100%;background:linear-gradient(to right,var(--neon-cyan),var(--neon-pink));transition:width 0.5s ease;}
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+  <canvas id="bgStars" style="position:absolute;top:0;left:0;pointer-events:none;"></canvas>
+  <div style="position:relative;z-index:2;text-align:center;">
+    <div class="title-main">🚀 RYMDINVADERS</div>
+    <div class="title-sub">Gymnasienivå · SvN1</div>
+    <p style="margin-top:30px;color:rgba(200,220,255,0.7);font-size:0.85rem;letter-spacing:1px;">Välj en sektor att försvara</p>
+    <div class="sector-grid">
+      <button class="sector-btn" onclick="startSector(0)"><span class="sector-icon">📚</span>Genrekollen<div class="sector-count">30 av 45 frågor slumpas</div></button>
+      <button class="sector-btn" onclick="startSector(1)"><span class="sector-icon">🏛️</span>Epokjägaren<div class="sector-count">30 av 45 frågor slumpas</div></button>
+      <button class="sector-btn" onclick="startSector(2)"><span class="sector-icon">📰</span>Sakprosa-sikten<div class="sector-count">30 av 45 frågor slumpas</div></button>
+      <button class="sector-btn" onclick="startSector(3)"><span class="sector-icon">✏️</span>Grammatik-glidaren<div class="sector-count">30 av 45 frågor slumpas</div></button>
+    </div>
+    <button class="sector-btn-ultimate" onclick="startUltimate()">⚡ ULTIMATA UTMANINGEN ⚡<div class="sector-count" style="color:rgba(255,190,11,0.7);margin-top:6px;">30 frågor slumpas från ALLA kategorier</div></button>
+    <p style="margin-top:24px;color:rgba(150,170,200,0.6);font-size:0.75rem;">Styr med musen · Klicka för att skjuta rätt svar</p>
+  </div>
+</div>
+
+<div id="hud">
+  <div class="hud-item hud-score">⭐ <span id="scoreDisplay">0</span></div>
+  <div class="hud-item">
+    <div>Fråga <span id="questionNum">1</span>/30</div>
+    <div class="progress-bar-container" style="width:160px;margin-top:4px;"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+  </div>
+  <div class="hud-item">❤️ <span id="livesDisplay">3</span> liv</div>
+</div>
+
+<div id="questionDisplay"></div>
+<canvas id="gameCanvas"></canvas>
+
+<div id="reportScreen">
+  <canvas id="bgStars2" style="position:absolute;top:0;left:0;pointer-events:none;"></canvas>
+  <div style="position:relative;z-index:2;width:100%;display:flex;flex-direction:column;align-items:center;padding:20px;">
+    <div class="report-container">
+      <div class="report-title">📋 UPPDRAGSRAPPORT</div>
+      <div class="report-stats" id="reportStats"></div>
+      <div id="reportMissed"></div>
+    </div>
+    <div class="report-footer"><button class="neon-btn" onclick="showStart()">⬅ Välj ny sektor</button></div>
+  </div>
+</div>
+
+<script>
+// ===================== QUESTION DATA =====================
+// Each question: { q, correct, wrong1, wrong2, exp }
+// correct answer position is RANDOMIZED at spawn time
+
+const RAW_SECTORS = [
+  // ============ SEKTOR 0: GENREKOLLEN ============
+  { name:"Genrekollen", qs:[
+    { q:"Berättande litteratur – romaner och noveller kallas...", correct:"Epik", wrong1:"Lyrik", wrong2:"Dramatik", exp:"Epik är samlingsnamnet för berättande prosa och fiktion." },
+    { q:"Poesi och dikter som förmedlar en känsla eller stämning kallas...", correct:"Lyrik", wrong1:"Epik", wrong2:"Sakprosa", exp:"Lyrik fokuserar på korta ögonblick, stämningar och känslor." },
+    { q:"Texter skrivna för att framföras på en scen kallas...", correct:"Dramatik", wrong1:"Epik", wrong2:"Lyrik", exp:"Dramatik är handlingens litteratur – dialogen för berättelsen framåt." },
+    { q:"Den talande rösten i en dikt kallas...", correct:"Dikt-jag", wrong1:"Berättaren", wrong2:"Protagonisten", exp:"I lyrik kallas 'berättaren' för ett dikt-jag – det är inte nödvändigtvis författaren." },
+    { q:"Upprepning i början av flera versrader kallas...", correct:"Anafor", wrong1:"Allitteration", wrong2:"Besjälning", exp:"Anafor: varje rad eller fras inleds med samma ord eller fras." },
+    { q:"En bildlig jämförelse med ordet 'som' kallas...", correct:"Liknelse", wrong1:"Metafor", wrong2:"Symbol", exp:"Liknelse: 'Han var stark SOM en björn'. Notera jämförelseordet 'som'." },
+    { q:"Instruktioner om hur rum och miljö ska vara i ett manus kallas...", correct:"Scenanvisning", wrong1:"Replik", wrong2:"Spelanvisning", exp:"Scenanvisningar riktar sig till regissören och beskriver miljön." },
+    { q:"Samtal mellan två eller flera karaktärer kallas...", correct:"Dialog", wrong1:"Monolog", wrong2:"Replik", exp:"Dialog är när karaktärer pratar med varandra." },
+    { q:"Berättelsens höjdpunkt där konflikten avgörs kallas...", correct:"Klimax", wrong1:"Anslag", wrong2:"Avrundning", exp:"Klimax är den punkt där spänningen är som störst och konflikten avgörs." },
+    { q:"Döda föremål ges mänskliga egenskaper – det kallas...", correct:"Besjälning", wrong1:"Metafor", wrong2:"Symbol", exp:"Besjälning: 'väggen stirrade elakt'. Livlöst ting tillskrivs mänskliga egenskaper." },
+    { q:"En dikt som inte följer regler för rim eller fast rytm kallas...", correct:"Fri form", wrong1:"Bunden form", wrong2:"Sonet", exp:"Fri form är modern poesi utan fast takt eller rimschema." },
+    { q:"Berättare som har insyn i ALLA karaktärers tankar kallas...", correct:"Allvetande berättare", wrong1:"Jagberättare", wrong2:"Opålitlig berättare", exp:"Den allvetande (omnisciente) berättaren ser in i alla karaktärers inre." },
+    { q:"Ett konkret föremål som representerar en abstrakt idé kallas...", correct:"Symbol", wrong1:"Metafor", wrong2:"Liknelse", exp:"Symbol: duvan = fred. Konkret föremål med djupare abstrakt betydelse." },
+    { q:"Ett bildligt uttryck UTAN ordet 'som' kallas...", correct:"Metafor", wrong1:"Liknelse", wrong2:"Symbol", exp:"Metafor: 'Du är en ros'. Direkt liknar en sak vid en annan utan jämförelseord." },
+    { q:"En kort berättande text som fokuserar på EN händelse kallas...", correct:"Novell", wrong1:"Roman", wrong2:"Epos", exp:"Novellen är kort, koncentrerad och har ofta en poäng eller vändning i slutet." },
+    { q:"Ett sorgespel som slutar i olycka eller katastrof kallas...", correct:"Tragedi", wrong1:"Komedi", wrong2:"Farsens", exp:"Tragedier skildrar hjältens fall – ofta på grund av ett karaktärsfel." },
+    { q:"En grupp versrader i en dikt (motsvarar stycke i prosa) kallas...", correct:"Strof", wrong1:"Versrad", wrong2:"Stanza", exp:"Poesi delas in i strofer, inte stycken." },
+    { q:"En enskild rad i ett poem kallas...", correct:"Versrad", wrong1:"Strof", wrong2:"Stavelse", exp:"Versraden är den grundläggande byggnadsenheten i poesi." },
+    { q:"Berättelsens inledning där konflikten introduceras kallas...", correct:"Anslag", wrong1:"Klimax", wrong2:"Fördjupning", exp:"Anslaget är det som fångar läsarens intresse och presenterar konflikten." },
+    { q:"Instruktioner om hur något ska SÄGAS eller GÖRAS på scen kallas...", correct:"Spelanvisning", wrong1:"Scenanvisning", wrong2:"Rekvisita", exp:"Spelanvisningar riktar sig till skådespelaren och gäller agerande/tonfall." },
+    { q:"Lösa föremål som används på scen kallas...", correct:"Rekvisita", wrong1:"Scenografi", wrong2:"Dekor", exp:"Rekvisita är de rörliga föremål som används av skådespelarna." },
+    { q:"En längre berättande dikt om hjältar och gudar från antiken kallas...", correct:"Epos", wrong1:"Tragedi", wrong2:"Ode", exp:"Epos är långa berättelser på vers: Iliaden och Odysséen är exempel." },
+    { q:"Att en mening fortsätter på nästa rad utan paus i en dikt kallas...", correct:"Enjambement", wrong1:"Cesur", wrong2:"Anafor", exp:"Enjambement: radbrytning mitt i en syntaktisk enhet – skapar rörelse och fart." },
+    { q:"Upprepning av samma inledande konsonantljud i ord kallas...", correct:"Allitteration", wrong1:"Anafor", wrong2:"Assonans", exp:"Allitteration: 'Stora stygga vargen'. Samma inledande ljud upprepas." },
+    { q:"Berättelsens protagonist möter en antagonist. Vad är antagonisten?", correct:"Motspelaren", wrong1:"Hjälpfiguren", wrong2:"Berättarrösten", exp:"Antagonisten är den kraft eller person som motverkar protagonistens mål." },
+    { q:"Kameravinkel där man filmar uppifrån ner kallas...", correct:"Fågelperspektiv", wrong1:"Grodperspektiv", wrong2:"Normalperspektiv", exp:"Fågelperspektiv får motivet att verka litet och undergivet." },
+    { q:"Kameravinkel där man filmar nedifrån upp kallas...", correct:"Grodperspektiv", wrong1:"Fågelperspektiv", wrong2:"Halvbild", exp:"Grodperspektiv ger motivet auktoritet och styrka." },
+    { q:"Filmljud som BARA publiken hör (t.ex. bakgrundsmusik) kallas...", correct:"Icke-diegetiskt ljud", wrong1:"Diegetiskt ljud", wrong2:"Extradiegetiskt ljud", exp:"Icke-diegetiskt ljud existerar inte i filmens värld – bara för oss." },
+    { q:"Filmljud som karaktärerna i filmen OCKSÅ hör kallas...", correct:"Diegetiskt ljud", wrong1:"Icke-diegetiskt ljud", wrong2:"Voiceover", exp:"Diegetiskt ljud: radio i rummet, samtal – karaktärerna kan höra det." },
+    { q:"Bild där en person syns från midjan och upp kallas...", correct:"Halvbild", wrong1:"Helbild", wrong2:"Närbild", exp:"Halvbild används ofta i dialogscener och visar kroppsspråk ovan midjan." },
+    { q:"En text vars karaktärer, händelser och platser har en dold symbolisk mening kallas...", correct:"Allegori", wrong1:"Parodi", wrong2:"Satir", exp:"Allegori: Stiernhielms Hercules är en allegori om livsval – Lusta vs Dygd." },
+    { q:"Kritik av makten dold under humor och ironi kallas...", correct:"Satir", wrong1:"Parodi", wrong2:"Allegori", exp:"Satir används t.ex. av Voltaire och Swift för att kritisera samhälle och makt." },
+    { q:"Den dramaturgiska kurvan skapades av...", correct:"Aristoteles", wrong1:"Platon", wrong2:"Homeros", exp:"Aristoteles beskrev berättelsens dramaturgi i sin Poetik." },
+    { q:"Genren som fokuserar på ett enda ögonblick och förmedlar en känsla är...", correct:"Lyrik", wrong1:"Epik", wrong2:"Dramatik", exp:"Lyrik: koncentrerat språk, bildspråk, stämning – ordet kommer från instrumentet lyra." },
+    { q:"När meningen eller handlingen hoppar bakåt i tid kallas det...", correct:"Flashback / tillbakablick", wrong1:"Framåtblick", wrong2:"In medias res", exp:"Flashback (analepsis) bryter kronologin och återberättar något tidigare." },
+    { q:"En text med kontrast där motsatta egenskaper ställs mot varandra kallas...", correct:"Antites", wrong1:"Allitteration", wrong2:"Assonans", exp:"Antites skapar kontrast och förtydligar: 'liten men mäktig', 'dag och natt'." },
+    { q:"Berättelsens del då karaktärerna och miljön introduceras kallas...", correct:"Presentation", wrong1:"Anslag", wrong2:"Fördjupning", exp:"I presentationen får vi lära känna protagonist, antagonist och miljö." },
+    { q:"Ett lustspel som syftar till att underhålla och som slutar lyckligt kallas...", correct:"Komedi", wrong1:"Tragedi", wrong2:"Drama", exp:"Komedier slutar nästan alltid lyckligt – de belyser ofta mänskliga svagheter med humor." },
+    { q:"Antikens epos om Odysseus hemresa kallas...", correct:"Odysséen", wrong1:"Iliaden", wrong2:"Eneaden", exp:"Odysséen av Homeros handlar om Odysseus tioåriga hemresa till Ithaka." },
+    { q:"Antikens epos om kriget vid Troja kallas...", correct:"Iliaden", wrong1:"Odysséen", wrong2:"Eneaden", exp:"Iliaden av Homeros handlar om Akilles och grekernas krig mot Troja." },
+    { q:"Hur starka känslor eller spänning byggs upp över tid i en berättelse kallas...", correct:"Dramaturgiska kurvan", wrong1:"Kompositionsmodellen", wrong2:"Spänningsaxeln", exp:"Den dramaturgiska kurvan visar förhållandet mellan spänning och tid." },
+    { q:"En karaktär som förblir densamma genom hela berättelsen kallas...", correct:"Platt karaktär", wrong1:"Rund karaktär", wrong2:"Statisk antagonist", exp:"Platta karaktärer har få egenskaper och förändras inte – runda är mer komplexa." },
+    { q:"Klippning som visar två händelser som sker SAMTIDIGT kallas...", correct:"Parallellklippning", wrong1:"Osynlig klippning", wrong2:"Synlig klippning", exp:"Parallellklippning hoppar mellan två parallella handlingar för att skapa spänning." },
+    { q:"När filmen klipps så att vi INTE märker klipparna kallas...", correct:"Osynlig klippning", wrong1:"Synlig klippning", wrong2:"Parallellklippning", exp:"Osynlig klippning skapar ett flöde – vi lever oss in utan att störas av klippar." },
+    { q:"Hårt ljus med skarpa kontraster i film kallas...", correct:"Low key", wrong1:"High key", wrong2:"Dramatisk ljussättning", exp:"Low key: skuggorna är djupa och detaljerna i dem försvinner – skapar mystik/spänning." },
+  ]},
+
+  // ============ SEKTOR 1: EPOKJÄGAREN ============
+  { name:"Epokjägaren", qs:[
+    { q:"Epok med fokus på gudar, ödet och hjältar (700 f.Kr–500 e.Kr) kallas...", correct:"Antiken", wrong1:"Medeltiden", wrong2:"Renässansen", exp:"Antiken lade grunden för västerländsk litteratur, filosofi och demokrati." },
+    { q:"Gudscentrerad tid (500–1500 e.Kr) där kyrkan styrde kallas...", correct:"Medeltiden", wrong1:"Antiken", wrong2:"Upplysningen", exp:"Under medeltiden var den teocentriska världsbilden dominerande – Gud i centrum." },
+    { q:"Epoken vars namn betyder 'pånyttfödelse' av antikens ideal kallas...", correct:"Renässansen", wrong1:"Romantiken", wrong2:"Barocken", exp:"Renässansen (1400–1600) återupptäckte antikens konst och filosofi." },
+    { q:"Epok som betonade förnuft, empirism och vetenskap kallas...", correct:"Upplysningen", wrong1:"Romantiken", wrong2:"Renässansen", exp:"Upplysningen ville 'lysa upp mörkret' med förnuftets ljus." },
+    { q:"Epok som reagerade mot förnuftet med starka känslor och naturlängtan kallas...", correct:"Romantiken", wrong1:"Upplysningen", wrong2:"Realismen", exp:"Romantiken (ca 1790–1830) satte hjärta och känsla före förnuft." },
+    { q:"Epok som ville beskriva verkligheten objektivt – som ett fotografi kallas...", correct:"Realismen", wrong1:"Naturalismen", wrong2:"Romantiken", exp:"Realismen (ca 1830–1890) skildrade vardagsmänniskor och sociala problem." },
+    { q:"Epok som menade att arv och miljö determinerar individen kallas...", correct:"Naturalismen", wrong1:"Realismen", wrong2:"Modernismen", exp:"Naturalismen applicerade vetenskapliga metoder – individen styrs av biologi och samhälle." },
+    { q:"Epok (ca 1890–1945) som experimenterade med inre tankeflöden och bröt mot regler kallas...", correct:"Modernismen", wrong1:"Naturalismen", wrong2:"Romantiken", exp:"Modernismen fokuserade på det inre snarare än yttre verklighet." },
+    { q:"Att begå 'övermod' mot gudarna i antiken kallas...", correct:"Hybris", wrong1:"Nemesis", wrong2:"Katarsis", exp:"Hybris (övermod) ledde alltid till nemesis (gudarnas hämnd) i antiken." },
+    { q:"Gudarnas hämnd på den som begår hybris kallas...", correct:"Nemesis", wrong1:"Hybris", wrong2:"Katharsis", exp:"Nemesis är hämndens gudinna – den som bestraffar hybris." },
+    { q:"Skaparen av Iliaden och Odysséen kallas...", correct:"Homeros", wrong1:"Sapfo", wrong2:"Sofokles", exp:"Homeros är den legendariske blinde skalden som tillskrivs de stora epos." },
+    { q:"Den första kända kvinnliga diktaren från Lesbos kallas...", correct:"Sapfo", wrong1:"Medea", wrong2:"Antigone", exp:"Sapfo (ca 600 f.Kr) var pionjär inom lyrik och skapade den sapfiska versen." },
+    { q:"Dantes resa genom helvetet, skärselden och paradiset kallas...", correct:"Den gudomliga komedin", wrong1:"Odysséen", wrong2:"Don Quijote", exp:"Dante Alighieri sammanfattade hela den medeltida världsbilden i detta verk." },
+    { q:"Renässansens mest kände dramatiker som skrev Hamlet kallas...", correct:"Shakespeare", wrong1:"Molière", wrong2:"Cervantes", exp:"William Shakespeare (1564–1616) finansierades av den engelska kronan." },
+    { q:"Upphovsmakaren till Don Quijote kallas...", correct:"Cervantes", wrong1:"Shakespeare", wrong2:"Dante", exp:"Miguel de Cervantes (1547–1616) skapade en av världens första moderna romaner." },
+    { q:"Att kritisera makten med dold humor kallas...", correct:"Satir", wrong1:"Allegori", wrong2:"Ironi", exp:"Upplysningens författare (Swift, Voltaire) använde satir för att undvika censur." },
+    { q:"Kunskap genom erfarenhet och experiment – ett ledord för upplysningen – kallas...", correct:"Empirism", wrong1:"Rationalism", wrong2:"Deism", exp:"Empirism: man samlar erfarenheter och drar slutsatser systematiskt." },
+    { q:"Tron att Gud skapade världen men sedan lämnade den kallas...", correct:"Deism", wrong1:"Panteism", wrong2:"Ateism", exp:"Deism: Gud som 'urmakaren' som satte igång världen och sedan lät naturlagarna styra." },
+    { q:"Upplysningsromanen om förnuft och överlevnad på en öde ö heter...", correct:"Robinson Crusoe", wrong1:"Gullivers resor", wrong2:"Candide", exp:"Daniel Defoes Robinson Crusoe (1719) visar upplysningens optimistiska livsyn." },
+    { q:"Vem skrev Frankenstein – en varning för vetenskapen (romantiken)?", correct:"Mary Shelley", wrong1:"Jane Austen", wrong2:"Charlotte Brontë", exp:"Mary Shelleys Frankenstein (1818) är ett typiskt romantiskt verk om vetenskapens gränser." },
+    { q:"Tron att Gud finns i hela naturen – typisk under romantiken – kallas...", correct:"Panteism", wrong1:"Deism", wrong2:"Ateism", exp:"Romantikerna sökte Gud i naturen; mötet med naturen upplevdes som religiöst." },
+    { q:"Längtan bort från verkligheten – ett romantikens drag – kallas...", correct:"Eskapism", wrong1:"Nihilism", wrong2:"Determinism", exp:"Eskapism: romantikerna flydde till fantasins värld, fjärran länder och det förflutna." },
+    { q:"Tanken att individen är förutbestämd av arv och miljö (naturalismen) kallas...", correct:"Determinism", wrong1:"Empirism", wrong2:"Existentialism", exp:"Determinism: individen har ingen fri vilja – biologi och samhälle styr." },
+    { q:"Sveriges mest kände realist/naturalist som skrev Röda rummet heter...", correct:"Strindberg", wrong1:"Lagerlöf", wrong2:"Heidenstam", exp:"August Strindbergs Röda rummet (1879) anses starta den moderna svenska romanen." },
+    { q:"Freuds idé som påverkade modernismens litteratur kallas...", correct:"Det undermedvetna", wrong1:"Överjaget", wrong2:"Kollektivt minne", exp:"Modernisterna ville fånga vad som pågick under ytan – Freuds teorier om drömmar m.m." },
+    { q:"Banbrytande finlandssvensk modernistisk poet kallad är...", correct:"Edith Södergran", wrong1:"Karin Boye", wrong2:"Harriet Löwenhjelm", exp:"Edith Södergrans Dikter (1916) förnyade den svenska lyriken radikalt." },
+    { q:"Idéströmningen under renässansen som satte individen och mänskligheten i centrum kallas...", correct:"Humanismen", wrong1:"Empirismen", wrong2:"Panteismen", exp:"Humanismen återupptäckte antikens ideal och betonade varje människas unika värde." },
+    { q:"En renässansmänniska som kan allt inom alla fält kallas...", correct:"Universalgeni", wrong1:"Humanist", wrong2:"Empirist", exp:"Leonardo da Vinci är idealet – konstnär, vetenskapsman, ingenjör och filosof." },
+    { q:"Medeltidens kärlighetsdiktare på hoven kallades...", correct:"Trubadurer", wrong1:"Skalder", wrong2:"Minnespojkar", exp:"Trubadurerna uppvaktade slottsfrun och sjöng om hövisk kärlek." },
+    { q:"Det feodala system under medeltiden där vasaller svär trohetsed till kungen kallas...", correct:"Feodalismen", wrong1:"Demokratin", wrong2:"Merkantilismen", exp:"Feodalism: kungar äger land → tilldelar vasaller → som kräver skatt av bönder." },
+    { q:"Epoken som startade med hopp om framsteg men övergick i världskrig kallas...", correct:"Modernismen", wrong1:"Naturalismen", wrong2:"Realismen", exp:"Modernismens (1890–1945) optimism krossades av Första och Andra världskriget." },
+    { q:"En av antikens filosofer känd för sin frågemetod ('sokratisk metod') kallas...", correct:"Sokrates", wrong1:"Platon", wrong2:"Aristoteles", exp:"Sokrates (ca 470–399 f.Kr) ställde ständigt frågor – han skrev ingenting själv." },
+    { q:"Aristoteles elev som skapade idévärlden och skrev Staten kallas...", correct:"Platon", wrong1:"Sokrates", wrong2:"Aristoteles", exp:"Platon (ca 427–347 f.Kr) var Sokrates elev och grundade Akademin i Aten." },
+    { q:"Filosofen som systematiserade kunskap från biologi till retorik kallas...", correct:"Aristoteles", wrong1:"Platon", wrong2:"Sokrates", exp:"Aristoteles (384–322 f.Kr) lade grunden för logik, vetenskap och poetik." },
+    { q:"Demokratin uppfanns i vilken antik stadsstat?", correct:"Aten", wrong1:"Sparta", wrong2:"Korinth", exp:"I Aten fick fria manliga medborgare rösta och delta i beslut." },
+    { q:"Georg Stiernhielm kallas för...", correct:"Svenska skaldekonstens fader", wrong1:"Den förste realisten", wrong2:"Upplysningens röst i Sverige", exp:"Stiernhielm (1598–1672) ville visa att svenska fungerar lika bra som latin i poesi." },
+    { q:"Upplysningens tidstypiska litteraturform för att dölja samhällskritik var...", correct:"Satir och allegori", wrong1:"Realistisk roman", wrong2:"Nationalromantisk lyrik", exp:"Att kritisera öppet var riskabelt – satir och allegorier dolde budskapet." },
+    { q:"Romanens genre som liknar epos men är skriven i prosa uppstod under...", correct:"Renässansen", wrong1:"Medeltiden", wrong2:"Antiken", exp:"Romanen ersatte gradvis versberättelserna under renässansen." },
+    { q:"Under vilket drama av Sofokles mördar en kung sin far och gifter sig med sin mor?", correct:"Kung Oidipus", wrong1:"Antigone", wrong2:"Medea", exp:"Kung Oidipus är ett klassiskt exempel på hybris och nemesis i antikens tragedi." },
+    { q:"Hamlet utspelar sig i vilket land?", correct:"Danmark", wrong1:"England", wrong2:"Frankrike", exp:"Hamlet utspelar sig vid det danska hovet – Shakespeares tragedi från ca 1601." },
+    { q:"Den industriella revolutionen är bakgrund till vilken epok?", correct:"Realismen och naturalismen", wrong1:"Romantiken", wrong2:"Upplysningen", exp:"Fabrikerna, klasskillnaderna och urbaniseringen skapade realismens ämnen." },
+    { q:"Strömning inom modernismen som hämtade material ur drömmar och det undermedvetna kallas...", correct:"Surrealism", wrong1:"Expressionism", wrong2:"Absurdism", exp:"Surrealismen (1920-tal, Breton) utforskade det omedvetna och drömmarnas logik." },
+    { q:"Modernistisk strömning som visar hur det KÄNNS snarare än hur det ser ut kallas...", correct:"Expressionism", wrong1:"Surrealism", wrong2:"Impressionism", exp:"Expressionisterna förvrängde formen för att gestalta inre känslor och ångest." },
+    { q:"Karin Boyes dystopiska roman om ett totalitärt samhälle heter...", correct:"Kallocain", wrong1:"Hemsöborna", wrong2:"Singoalla", exp:"Kallocain (1940) är en av Sveriges viktigaste dystopier och modernistiska romaner." },
+    { q:"Vem fick Sveriges förste Nobelpris i litteratur (1909)?", correct:"Selma Lagerlöf", wrong1:"August Strindberg", wrong2:"Verner von Heidenstam", exp:"Selma Lagerlöf, känd bl.a. för Gösta Berlings saga, fick priset 1909." },
+    { q:"Svenska Akademien grundades år...", correct:"1786", wrong1:"1729", wrong2:"1800", exp:"Gustav III grundade Svenska Akademien 1786 under den gustavianska eran." },
+  ]},
+
+  // ============ SEKTOR 2: SAKPROSA-SIKTEN ============
+  { name:"Sakprosa-sikten", qs:[
+    { q:"Texter baserade på fakta och verklighet (ej skönlitteratur) kallas...", correct:"Sakprosa", wrong1:"Fiktion", wrong2:"Lyrik", exp:"Sakprosa behandlar faktiska ämnen och syftar till att informera, instruera eller argumentera." },
+    { q:"En text som vill ÖVERTYGA läsaren om en åsikt kallas...", correct:"Argumenterande text", wrong1:"Utredande text", wrong2:"Informerande text", exp:"Argumenterande text presenterar en tes och stöder den med argument." },
+    { q:"En text som UNDERSÖKER en fråga allsidigt och objektivt kallas...", correct:"Utredande text", wrong1:"Argumenterande text", wrong2:"Informerande text", exp:"Utredande texter vill sprida kunskap och belyser ett ämne från flera sidor." },
+    { q:"En text vars enda syfte är att ge information (t.ex. bruksanvisning) kallas...", correct:"Informerande text", wrong1:"Argumenterande text", wrong2:"Utredande text", exp:"Instruktioner och manualer är informerande texter." },
+    { q:"Att anpassa språket och innehållet efter vem som ska läsa kallas...", correct:"Mottagaranpassning", wrong1:"Källkritik", wrong2:"Referatmarkering", exp:"Man skriver annorlunda till en kompis än till en rektor." },
+    { q:"Att kritiskt granska om en källa är sann och opartisk kallas...", correct:"Källkritik", wrong1:"Källtillit", wrong2:"Textbindning", exp:"Källkritik kräver att man granskar: Vem? När? Varför? Vilket intresse?" },
+    { q:"Att lita på etablerade och expertgranskade källor kallas...", correct:"Källtillit", wrong1:"Källkritik", wrong2:"Trovärdighet", exp:"Källtillit innebär att man ger etablerade källor (forskning, myndigheter) rimlig tilltro." },
+    { q:"En objektiv sammanfattning av en annan texts innehåll kallas...", correct:"Referat", wrong1:"Recension", wrong2:"Analys", exp:"Referatet återger en texts innehåll utan egna åsikter eller tolkningar." },
+    { q:"Ord som 'Enligt artikeln' eller 'Författaren menar' kallas...", correct:"Referatmarkör", wrong1:"Källhänvisning", wrong2:"Citat", exp:"Referatmarkörer visar att du återger någon annans tankar, inte dina egna." },
+    { q:"Att återge en text ord för ord inom citattecken kallas...", correct:"Citat", wrong1:"Referat", wrong2:"Parafras", exp:"Citat används för att bevisa exakt vad någon har sagt eller skrivit." },
+    { q:"Info om författare, titel och år som placeras i texten kallas...", correct:"Källhänvisning", wrong1:"Källförteckning", wrong2:"Referatmarkör", exp:"Källhänvisningen gör att läsaren kan spåra var informationen kommer ifrån." },
+    { q:"Sammanställning av alla källor listad i slutet kallas...", correct:"Källförteckning", wrong1:"Källhänvisning", wrong2:"Referatmarkör", exp:"Källförteckningen listar alla använda källor, ofta alfabetiskt." },
+    { q:"Huvudpåståendet i en argumenterande text kallas...", correct:"Tes", wrong1:"Argument", wrong2:"Slutsats", exp:"Tesen är det du vill att läsaren ska hålla med om – textens kärnpåstående." },
+    { q:"Ordningen inledning – huvuddel – avslutning kallas...", correct:"Disposition", wrong1:"Struktur", wrong2:"Komposition", exp:"Dispositionen är textens röda tråd – dess skelett." },
+    { q:"En källa vars avsändare vill sälja något kallas ofta...", correct:"Vinklad", wrong1:"Primär", wrong2:"Sekundär", exp:"Reklam och propaganda är sällan opartiska – de har ett tydligt intresse." },
+    { q:"Stycket i en text som ska VÄCKA intresse kallas...", correct:"Inledning", wrong1:"Tesen", wrong2:"Slutsatsen", exp:"Inledningen ska locka läsaren att vilja läsa vidare." },
+    { q:"En kort sammanfattning med egna ord av vad en text handlar om kallas...", correct:"Parafras", wrong1:"Citat", wrong2:"Referat", exp:"Parafrasen återberättar innehållet med dina egna ord – inte ordagrant." },
+    { q:"Källkritisk fråga om NÄR en text skrevs kallas...", correct:"Tidskriteriet", wrong1:"Tendenskriteriet", wrong2:"Beroendekritik", exp:"Gamla fakta kan vara inaktuella – tidskriteriet granskar källans aktualitet." },
+    { q:"Källkritisk fråga om VAD avsändaren VILL kallas...", correct:"Tendenskriteriet", wrong1:"Tidskriteriet", wrong2:"Ursprungskriteriet", exp:"Tendenskriteriet: letar efter dolda motiv och vinklingar hos avsändaren." },
+    { q:"Den ursprungliga förstahandskällan (t.ex. ett originalmanuskript) kallas...", correct:"Primärkälla", wrong1:"Sekundärkälla", wrong2:"Tertiärkälla", exp:"Primärkällan är originalet – en sekundärkälla tolkar eller sammanfattar primärkällan." },
+    { q:"En källa som tolkar och sammanfattar primärkällor kallas...", correct:"Sekundärkälla", wrong1:"Primärkälla", wrong2:"Tertiärkälla", exp:"Sekundärkällan (t.ex. en lärobok) bygger på primärkällorna." },
+    { q:"Retorikens tre övertygelsemedel kallas...", correct:"Logos, ethos, pathos", wrong1:"Tes, argument, slutsats", wrong2:"Inledning, kärna, avslut", exp:"Logos (förnuft), ethos (trovärdighet), pathos (känsla) – den retoriska triangeln." },
+    { q:"Att appellera till PUBLIKENS KÄNSLOR i retorik kallas...", correct:"Pathos", wrong1:"Logos", wrong2:"Ethos", exp:"Pathos väcker empati, rädsla eller glädje för att engagera publiken." },
+    { q:"Att bygga sin trovärdighet som talare kallas...", correct:"Ethos", wrong1:"Pathos", wrong2:"Logos", exp:"Ethos: vem är du? Varför ska jag lyssna på dig? Erfarenhet och karaktär." },
+    { q:"Att övertala med fakta, statistik och logiska slutledningar kallas...", correct:"Logos", wrong1:"Pathos", wrong2:"Ethos", exp:"Logos övertalar via förnuft – siffror, forskning och logiska kedjor." },
+    { q:"Att ta upp och bemöta invändningar mot den egna tesen kallas...", correct:"Motargument", wrong1:"Slutsats", wrong2:"Tes", exp:"Att hantera motargument gör texten mer nyanserad och trovärdig." },
+    { q:"En kortfattad illustrerande berättelse som konkretiserar ett argument kallas...", correct:"Anekdot", wrong1:"Analogi", wrong2:"Exempel", exp:"Anekdoten engagerar läsaren och gör abstrakta argument levande och mänskliga." },
+    { q:"Att dra en allmän slutsats från specifika fall kallas...", correct:"Generalisering", wrong1:"Specificering", wrong2:"Deduktion", exp:"Generalisering: från enstaka exempel skapar man en allmän regel – kan bli förhastad." },
+    { q:"Logikfelet att angripa personens karaktär istället för argumentet kallas...", correct:"Ad hominem", wrong1:"Halmgubbe", wrong2:"Falskt dilemma", exp:"Ad hominem (latin: mot personen) är ett logikfel – man angriper motståndaren, inte saken." },
+    { q:"Logikfelet att presentera ett falskt antingen/eller kallas...", correct:"Falskt dilemma", wrong1:"Ad hominem", wrong2:"Halmgubbe", exp:"Falskt dilemma: 'Antingen är du med oss eller mot oss' – utesluter mellanlägen." },
+    { q:"Att förvränga motståndares argument för att lättare attackera dem kallas...", correct:"Halmgubbe", wrong1:"Ad hominem", wrong2:"Falskt dilemma", exp:"Halmgubbe: man skapar en förvrängd version av motståndarens tes och angriper den." },
+    { q:"En systematisk snedvridning beroende på perspektiv eller intresse kallas...", correct:"Bias", wrong1:"Källtillit", wrong2:"Tendens", exp:"Bias är en systematisk förvrängning – t.ex. att mediabolag rapporterar mer positivt om ägarna." },
+    { q:"Hur meningar och stycken kopplas samman med pronomen och konnektorer kallas...", correct:"Textbindning", wrong1:"Disposition", wrong2:"Kohesion", exp:"Textbindning skapar en röd tråd: pronominell referens, synonymer, konnektorer." },
+    { q:"En kritisk, värderande text om ett konstnärligt verk kallas...", correct:"Recension", wrong1:"Referat", wrong2:"Rapport", exp:"Recensionen bedömer ett verk (bok, film, teater) och ger läsaren en rekommendation." },
+    { q:"En strukturerad framställning av fakta och slutsatser om ett ämne kallas...", correct:"Rapport", wrong1:"Recension", wrong2:"Debattartikel", exp:"Rapporten redogör systematiskt för ett ämne eller en undersökning." },
+    { q:"En argumenterande text i en tidning med tydlig ståndpunkt kallas...", correct:"Debattartikel", wrong1:"Insändare", wrong2:"Ledare", exp:"Debattartikeln vill påverka opinion och har en klar tes som drivs med argument." },
+    { q:"En text av en privatperson skickad till en tidning kallas...", correct:"Insändare", wrong1:"Debattartikel", wrong2:"Krönika", exp:"Insändaren är ett läsarinlägg – ofta kortare och mer personligt än en debattartikel." },
+    { q:"Att skumma igenom rubriker och underrubriker FÖRE läsning kallas...", correct:"Förhandsläsning / skumläsning", wrong1:"Närstudie", wrong2:"Kritisk läsning", exp:"En lässtrategi: skaffa dig en översikt av texten innan du läser den i detalj." },
+    { q:"Kan man ha med egna åsikter i ett objektivt referat?", correct:"Nej", wrong1:"Ja", wrong2:"Bara i inledningen", exp:"Referatet ska vara helt objektivt – inga egna värderingar eller tolkningar." },
+    { q:"Vad kallas den retoriska processen att planera innehåll och struktur?", correct:"Dispositio", wrong1:"Inventio", wrong2:"Elocutio", exp:"Dispositio handlar om att organisera och ordna delarna i tal/text." },
+    { q:"Vilken texttyp är en vetenskaplig rapport?", correct:"Utredande", wrong1:"Argumenterande", wrong2:"Informerande", exp:"Rapporten undersöker ett problem systematiskt utan att nödvändigtvis ta ställning." },
+    { q:"Att argumentera med parallellfall ('X liknar Y') kallas...", correct:"Analogiargument", wrong1:"Induktivt resonemang", wrong2:"Deduktivt syllogism", exp:"Analogiargumentet: om X och Y liknar varandra i ett avseende, gör de det i ett annat." },
+    { q:"Vad bör placeringen av tesen oftast vara i en debattartikel?", correct:"I inledningen", wrong1:"I avslutningen", wrong2:"I mittdelen", exp:"Läsaren bör få veta din åsikt tidigt – tesen placeras vanligen i inledningen." },
+    { q:"Källkritisk granskning av om en källa är oberoende eller beroende kallas...", correct:"Beroendekritik", wrong1:"Tidskriteriet", wrong2:"Tendenskriteriet", exp:"Beroendekritik: är källan oberoende, eller baserar den sig på en enda annan källa?" },
+    { q:"Vad kallas det när du med egna ord sammanfattar någon annans text och anger källan?", correct:"Parafras med källhänvisning", wrong1:"Citat", wrong2:"Plagiat", exp:"Parafras + källhänvisning är korrekt sätt att använda källmaterial utan att plagiera." },
+    { q:"Motargument i en text gör den mer...", correct:"Nyanserad och trovärdig", wrong1:"Förvirrande", wrong2:"Kortare", exp:"Att bemöta invändningar stärker argumentationen och visar att du tagit hänsyn till andra perspektiv." },
+  ]},
+
+  // ============ SEKTOR 3: GRAMMATIK-GLIDAREN ============
+  { name:"Grammatik-glidaren", qs:[
+    { q:"Namn på saker, personer, platser och tillstånd kallas...", correct:"Substantiv", wrong1:"Adjektiv", wrong2:"Verb", exp:"Substantiv: bord, kärlek, Sverige, elev. Kan ha en/ett framför sig." },
+    { q:"Ord som beskriver hur något är eller ser ut kallas...", correct:"Adjektiv", wrong1:"Adverb", wrong2:"Substantiv", exp:"Adjektivet modifierar substantivet: stor, grön, snabb." },
+    { q:"Ord som anger handlingar, skeenden eller tillstånd kallas...", correct:"Verb", wrong1:"Substantiv", wrong2:"Adverb", exp:"Verbet är satsens kärna: springa, vara, hoppas." },
+    { q:"Ord som beskriver verb, adjektiv eller andra adverb kallas...", correct:"Adverb", wrong1:"Adjektiv", wrong2:"Pronomen", exp:"Adverbet svarar på Hur? Var? När? – snabbt, mycket, aldrig." },
+    { q:"Ord som anger förhållanden i tid, rum eller logik (i, på, under) kallas...", correct:"Prepositioner", wrong1:"Konjunktioner", wrong2:"Subjunktioner", exp:"Prepositioner visar var något befinner sig i förhållande till något annat." },
+    { q:"Ord som ersätter eller refererar till substantiv (han, hon, den) kallas...", correct:"Pronomen", wrong1:"Adjektiv", wrong2:"Adverb", exp:"Pronomen ersätter substantiv och undviker upprepning." },
+    { q:"Ord som binder JÄMNSTÄLLDA delar (och, men, eller) kallas...", correct:"Konjunktioner", wrong1:"Subjunktioner", wrong2:"Prepositioner", exp:"Konjunktionen är 'klister' mellan jämnordnade satser eller fraser." },
+    { q:"Ord som UNDERORDNAR en bisats (att, om, när, eftersom) kallas...", correct:"Subjunktioner", wrong1:"Konjunktioner", wrong2:"Prepositioner", exp:"Subjunktionen inleder bisatsen: 'att hon kom', 'om det regnar'." },
+    { q:"Utropsord som Aj! Oj! Hej! kallas...", correct:"Interjektioner", wrong1:"Adverb", wrong2:"Pronomen", exp:"Interjektioner uttrycker starka känslor eller hälsningar." },
+    { q:"De minsta betydelsebärande delarna av ett ord kallas...", correct:"Morfem", wrong1:"Fonem", wrong2:"Grafem", exp:"Morfem: rotmorfem + prefix + suffix. T.ex. 'o-lycka-lig-het' = 4 morfem." },
+    { q:"De minsta ljuden i ett språk kallas...", correct:"Fonem", wrong1:"Grafem", wrong2:"Morfem", exp:"Fonem är språkljud – svenska har fler vokalljud än bokstäver." },
+    { q:"Skriven representation av ett språkljud (bokstav) kallas...", correct:"Grafem", wrong1:"Fonem", wrong2:"Morfem", exp:"Grafem är bokstaven – representationen av fonemet i skrift." },
+    { q:"Prefix sätts... i ett ord.", correct:"Före roten", wrong1:"Efter roten", wrong2:"I mitten av roten", exp:"Prefix: o-tur, miss-förstå. Prefix ändrar ordets betydelse." },
+    { q:"Suffix sätts... i ett ord.", correct:"Efter roten", wrong1:"Före roten", wrong2:"Runt roten", exp:"Suffix: läs-ning, vän-lig. Suffix ändrar ofta ordklassen." },
+    { q:"Om svenska har utrum (en-ord) eller neutrum (ett-ord) kallas det...", correct:"Genus", wrong1:"Numerus", wrong2:"Bestämdhet", exp:"Genus: 'en bil' (utrum) vs 'ett hus' (neutrum)." },
+    { q:"Om ett substantiv är i singular eller plural kallas det...", correct:"Numerus", wrong1:"Genus", wrong2:"Bestämdhet", exp:"Numerus: ett hus (singular) – tre hus (plural)." },
+    { q:"'En bok' (obestämd) vs 'boken' (bestämd) är skillnaden i...", correct:"Bestämdhet", wrong1:"Genus", wrong2:"Numerus", exp:"Bestämdhet: vi vet vilken sak det gäller (bestämd) eller inte (obestämd)." },
+    { q:"Glad – Gladare – Gladast är ett adjektivs...", correct:"Komparation", wrong1:"Kongruens", wrong2:"Genus", exp:"Komparation jämför adjektivets styrka: positiv – komparativ – superlativ." },
+    { q:"Verbets grundform som ofta kommer efter 'att' kallas...", correct:"Infinitiv", wrong1:"Presens", wrong2:"Supinum", exp:"Infinitiv: att läsa, att springa – verbets oböjda grundform." },
+    { q:"Verbformen för det som händer just nu kallas...", correct:"Presens", wrong1:"Preteritum", wrong2:"Infinitiv", exp:"Presens är nutid: han läser, de sjunger." },
+    { q:"Verbformen för avslutad dåtid (tittade, reste) kallas...", correct:"Preteritum", wrong1:"Presens", wrong2:"Supinum", exp:"Preteritum berättar om något som redan hänt och är avslutat." },
+    { q:"Verbformen som används med 'har' eller 'hade' kallas...", correct:"Supinum", wrong1:"Preteritum", wrong2:"Perfekt particip", exp:"Supinum: jag har ÄTIT, vi hade SOVIT. Bildas med -t eller -it." },
+    { q:"'En STOR bil' – 'ett STORT hus' visar att adjektivet anpassas till substantivets genus – det kallas...", correct:"Kongruens", wrong1:"Komparation", wrong2:"Kasus", exp:"Kongruens: adjektivet böjs efter substantivets genus och numerus." },
+    { q:"Den som utför handlingen i meningen kallas...", correct:"Subjekt", wrong1:"Objekt", wrong2:"Predikat", exp:"Subjekt: HUNDEN skäller. Fråga: Vem/vad utför handlingen?" },
+    { q:"Satsens verbfras – vad som händer – kallas...", correct:"Predikat", wrong1:"Subjekt", wrong2:"Objekt", exp:"Predikat: Klass-en SJUNGER. Fråga: Vad händer?" },
+    { q:"Det som PÅVERKAS av handlingen (Vad/vem?) kallas...", correct:"Objekt", wrong1:"Subjekt", wrong2:"Predikativ", exp:"Objekt: Katten jagar MUSEN. Musen tar emot handlingen." },
+    { q:"Bestämning till subjekt via kopulaverb (vara/bli) kallas...", correct:"Predikativ", wrong1:"Objekt", wrong2:"Adverbial", exp:"Predikativ: Han är LÄKARE. Via 'vara' beskrivs subjektet." },
+    { q:"En sats som KAN stå ensam kallas...", correct:"Huvudsats", wrong1:"Bisats", wrong2:"Relativsats", exp:"Huvudsatsen är självständig: 'Ella springer.' Bisatsen kan inte stå ensam." },
+    { q:"En sats som INTE kan stå ensam (t.ex. '...eftersom det regnar') kallas...", correct:"Bisats", wrong1:"Huvudsats", wrong2:"Relativsats", exp:"Bisatsen ger extra info till huvudsatsen men är underordnad." },
+    { q:"Ord som 'inte', 'kanske', 'alltid' som modifierar hela satsens innebörd kallas...", correct:"Satsadverbial", wrong1:"Adverb", wrong2:"Predikativ", exp:"Satsadverbialet gäller hela satsens proposition, inte bara verbet." },
+    { q:"I BISATS placeras satsadverbialet (t.ex. 'inte') FÖRE eller EFTER verbet?", correct:"Före verbet", wrong1:"Efter verbet", wrong2:"I satsens början", exp:"Bisatsordföljd: subjunktion + subjekt + satsadverbial + verb: 'att han INTE vill'." },
+    { q:"I svenska huvudsatser intar det finita verbet alltid... plats – det kallas V2-regeln.", correct:"Andra", wrong1:"Första", wrong2:"Tredje", exp:"V2: 'Igår ÅKTE vi till stan.' Oavsett vad som inleder satsen – verbet är nummer 2." },
+    { q:"Komparera oregelbundna adjektivet 'bra'.", correct:"Bättre, Bäst", wrong1:"Braare, Braast", wrong2:"Mer bra, Mest bra", exp:"Bra är oregelbundet: bra – bättre – bäst." },
+    { q:"En mening som ger en uppmaning ('Skynda dig!') kallas...", correct:"Imperativsats", wrong1:"Deklarativ sats", wrong2:"Interrogativ sats", exp:"Imperativsatsen uttrycker en order eller uppmaning. Verbet står i imperativform." },
+    { q:"Verbformen som anger pågående handling och fungerar som adjektiv (leende, brinnande) kallas...", correct:"Presens particip", wrong1:"Perfekt particip", wrong2:"Supinum", exp:"Presens particip slutar på -ande/-ende: 'en leende kvinna'." },
+    { q:"Verbformen som anger resultattillstånd och fungerar som adjektiv (målad, trasig) kallas...", correct:"Perfekt particip", wrong1:"Presens particip", wrong2:"Supinum", exp:"Perfekt particip: 'ett målat hus', 'en trasig cykel'." },
+    { q:"En bisats inledd av relativpronomen 'som' eller 'vars' kallas...", correct:"Relativsats", wrong1:"Objektssats", wrong2:"Adverbialsats", exp:"Relativsats: 'Boken SOM jag läste var bra.' Inleds av 'som', 'vars' osv." },
+    { q:"Grundtal (ett, två) och ordningstal (första, andra) kallas...", correct:"Räkneord", wrong1:"Pronomen", wrong2:"Adverb", exp:"Räkneord anger antal (ett, tre) eller ordning (första, sjunde)." },
+    { q:"Att ord anpassar sin form efter varandra (adjektiv → substantivets genus) kallas...", correct:"Kongruens", wrong1:"Komparation", wrong2:"Rektion", exp:"Kongruens: adjektivet böjs för att stämma med substantivets genus och numerus." },
+    { q:"Två rotmorfem som slås ihop till ett nytt ord kallas...", correct:"Sammansatt ord", wrong1:"Avlett ord", wrong2:"Partikelverb", exp:"Sammansatt ord: sol+bränna=solbränna. Viktigt: på svenska skrivs dessa ihop!" },
+    { q:"Hur svarar man på frågan 'Vad/vem påverkas av handlingen' i en mening?", correct:"Objekt", wrong1:"Subjekt", wrong2:"Predikat", exp:"Objektet tar emot handlingen: 'Ella läser BOKEN.' Boken är objekt." },
+    { q:"Verbformen för framtid (ska läsa, kommer skriva) kallas...", correct:"Futurum", wrong1:"Presens", wrong2:"Preteritum", exp:"Futurum berättar om det som ska hända: 'Jag ska resa till Paris'." },
+    { q:"När ett pronomen syftar tillbaka på en tidigare nämnd entitet kallas det...", correct:"Anaforisk referens", wrong1:"Kataforisk referens", wrong2:"Deiktisk referens", exp:"Anafor pekar bakåt: 'Ella sprang. HON var snabb.' – 'hon' syftar på Ella." },
+    { q:"Den AKTIVA satsformen innebär att...", correct:"Subjektet utför handlingen", wrong1:"Handlingen betonas, aktören okänd", wrong2:"Verbet står i passivform", exp:"Aktiv: 'Kocken lagar mat.' Passiv: 'Maten lagas (av kocken).'." },
+    { q:"S-passiv och bli-passiv är former av...", correct:"Passiv satsform", wrong1:"Aktiv satsform", wrong2:"Imperativsats", exp:"Passiv: 'Dörren öppnades' (s-passiv) eller 'Dörren blev öppnad' (bli-passiv)." },
+    { q:"Den betonade stavelsen i ett ord kallas...", correct:"Huvudbetoning", wrong1:"Reduktion", wrong2:"Vokalförlängning", exp:"Betoningen ger extra kraft – i sammansatta ord är ofta båda lederna betonade." },
+  ]}
+];
+
+// ===================== AUDIO ENGINE =====================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+let bgGainNode = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new AudioCtx();
+  startBgMusic();
+}
+
+function startBgMusic() {
+  if (!audioCtx) return;
+  bgGainNode = audioCtx.createGain();
+  bgGainNode.gain.value = 0.07;
+  bgGainNode.connect(audioCtx.destination);
+
+  const freqs = [55, 110, 165, 220, 82.5];
+  freqs.forEach((f, i) => {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = i % 2 === 0 ? 'sine' : 'triangle';
+    osc.frequency.value = f;
+    g.gain.value = 0.3 + i * 0.04;
+    osc.connect(g); g.connect(bgGainNode);
+    const lfo = audioCtx.createOscillator();
+    const lg = audioCtx.createGain();
+    lfo.frequency.value = 0.05 + i * 0.03;
+    lg.gain.value = 4;
+    lfo.connect(lg); lg.connect(osc.frequency);
+    osc.start(); lfo.start();
+  });
+
+  let step = 0;
+  const notes = [220, 261.6, 329.6, 392, 329.6, 261.6];
+  function arp() {
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = notes[step % notes.length];
+    g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+    o.connect(g); g.connect(bgGainNode);
+    o.start(); o.stop(audioCtx.currentTime + 1.5);
+    step++; setTimeout(arp, 1200);
+  }
+  setTimeout(arp, 600);
+}
+
+function playLaser() {
+  if (!audioCtx) return;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain(), d = audioCtx.createWaveShaper();
+  const c = new Float32Array(256);
+  for (let i=0;i<256;i++){const x=(i*2)/256-1;c[i]=x*3;} d.curve=c;
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(1200, audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.18);
+  g.gain.setValueAtTime(0.35, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+  o.connect(d); d.connect(g); g.connect(audioCtx.destination);
+  o.start(); o.stop(audioCtx.currentTime + 0.22);
+}
+
+function playCorrect() {
+  if (!audioCtx) return;
+  [523,659,784].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.frequency.value=f; o.type='sine';
+    g.gain.setValueAtTime(0,audioCtx.currentTime+i*0.1);
+    g.gain.linearRampToValueAtTime(0.25,audioCtx.currentTime+i*0.1+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+i*0.1+0.3);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(audioCtx.currentTime+i*0.1); o.stop(audioCtx.currentTime+i*0.1+0.35);
+  });
+}
+
+function playWrong() {
+  if (!audioCtx) return;
+  [220,180].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.frequency.value=f; o.type='sawtooth';
+    g.gain.setValueAtTime(0.2,audioCtx.currentTime+i*0.15);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+i*0.15+0.4);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(audioCtx.currentTime+i*0.15); o.stop(audioCtx.currentTime+i*0.15+0.45);
+  });
+}
+
+// ===================== STARS =====================
+function initStars(cid) {
+  const c = document.getElementById(cid); if (!c) return;
+  const ctx = c.getContext('2d');
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  const s = Array.from({length:200},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.5+0.3,bright:Math.random(),speed:Math.random()*0.0001+0.00003,tw:Math.random()*Math.PI*2}));
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    const t=Date.now()*0.001;
+    s.forEach(st=>{
+      st.y+=st.speed; if(st.y>1)st.y=0;
+      const a=0.4+0.6*Math.abs(Math.sin(t*0.5+st.tw));
+      ctx.beginPath(); ctx.arc(st.x*c.width,st.y*c.height,st.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(200,220,255,${a*st.bright})`; ctx.fill();
+    }); requestAnimationFrame(draw);
+  } draw();
+}
+
+// ===================== GAME STATE =====================
+let currentSector=0, questions=[], qIndex=0, score=0, lives=3, missedQuestions=[];
+let gameActive=false, animFrame=null;
+let ship={x:0,y:0};
+let bullets=[], asteroids=[], particles=[], gameStars=[];
+let currentQ=null, waitingForNext=false, nextTimer=0;
+let flashMessage=null, flashAlpha=0;
+
+const canvas=document.getElementById('gameCanvas');
+const gctx=canvas.getContext('2d');
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5);}
+
+function prepareQuestions(sectorIdx) {
+  // Take all raw questions, convert to game format with shuffled options
+  const raw = RAW_SECTORS[sectorIdx].qs;
+  const shuffled = shuffle(raw).slice(0, 30);
+  return shuffled.map(item => {
+    // Shuffle the 3 options and track correct index
+    const opts = shuffle([
+      {text: item.correct, isCorrect: true},
+      {text: item.wrong1, isCorrect: false},
+      {text: item.wrong2, isCorrect: false}
+    ]);
+    const correctIdx = opts.findIndex(o => o.isCorrect);
+    return {
+      q: item.q,
+      opts: opts.map(o => o.text),
+      a: correctIdx,
+      exp: item.exp
+    };
+  });
+}
+
+function initGameCanvas(){
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  ship.x=canvas.width/2; ship.y=canvas.height-90;
+  gameStars=Array.from({length:180},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.4+0.3,speed:Math.random()*0.4+0.1,alpha:Math.random()*0.7+0.3}));
+}
+
+canvas.addEventListener('mousemove',e=>{if(gameActive)ship.x=e.clientX;});
+canvas.addEventListener('click',()=>{if(!gameActive||waitingForNext)return;initAudio();fireBullet();});
+
+function fireBullet(){playLaser();bullets.push({x:ship.x,y:ship.y-30,speed:14,active:true});}
+
+function makeAsteroidPath(cx,cy,r,seed){
+  const pts=14,path=[];
+  for(let i=0;i<pts;i++){
+    const angle=(i/pts)*Math.PI*2;
+    const rnd=0.7+0.3*Math.sin(seed*13.7+i*7.3)*Math.cos(seed*5.1+i*3.7);
+    path.push({x:cx+Math.cos(angle)*r*rnd,y:cy+Math.sin(angle)*r*rnd});
+  } return path;
+}
+
+function drawAsteroid(ctx,ast){
+  const {x,y,r,seed,text,hit,hitAlpha=1}=ast;
+  ctx.save(); ctx.globalAlpha=hitAlpha;
+  const pts=makeAsteroidPath(x,y,r,seed);
+  ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
+  for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i].x,pts[i].y);
+  ctx.closePath();
+  if(hit==='correct'){ctx.fillStyle='#00ff7050';ctx.strokeStyle='#00ffa0';}
+  else if(hit==='wrong'){ctx.fillStyle='#ff003050';ctx.strokeStyle='#ff0060';}
+  else{ctx.fillStyle='rgba(30,40,80,0.85)';ctx.strokeStyle='rgba(0,245,255,0.6)';}
+  ctx.lineWidth=2; ctx.fill(); ctx.stroke();
+  ctx.fillStyle='rgba(80,100,140,0.3)';
+  for(let i=0;i<3;i++){
+    const cx2=x+(Math.sin(seed*3.1+i*4.7)*r*0.35);
+    const cy2=y+(Math.cos(seed*2.3+i*5.1)*r*0.35);
+    const cr=r*(0.08+0.06*Math.sin(seed+i));
+    ctx.beginPath();ctx.arc(cx2,cy2,cr,0,Math.PI*2);ctx.fill();
+  }
+  ctx.fillStyle=hit?(hit==='correct'?'#00ff90':'#ff4488'):'#ffffff';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  const fs=Math.max(11,Math.min(16,r*0.38));
+  ctx.font=`bold ${fs}px 'Share Tech Mono',monospace`;
+  const words=text.split(' '),lines=[];let line='';
+  const maxW=r*1.5;
+  words.forEach(w=>{const t2=line?line+' '+w:w;if(ctx.measureText(t2).width>maxW&&line){lines.push(line);line=w;}else line=t2;});
+  if(line)lines.push(line);
+  const lh=fs+3;
+  lines.forEach((l,i)=>ctx.fillText(l,x,y-(lines.length-1)*lh/2+i*lh));
+  ctx.restore();
+}
+
+function spawnAsteroids(q){
+  asteroids=[];
+  const cols=3,spacing=canvas.width/(cols+1);
+  const r=Math.min(85,canvas.width*0.11);
+  for(let i=0;i<3;i++){
+    asteroids.push({x:spacing*(i+1),y:-r-i*40,r,vy:0.8+Math.random()*0.4,seed:Math.random()*100,text:q.opts[i],answerIndex:i,hit:null,hitAlpha:1,active:true});
+  }
+}
+
+function spawnParticles(x,y,color,n=18){
+  for(let i=0;i<n;i++){
+    const angle=Math.random()*Math.PI*2,speed=1.5+Math.random()*4;
+    particles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,alpha:1,r:2+Math.random()*3,color,life:1});
+  }
+}
+
+function loadQuestion(){
+  if(qIndex>=questions.length){endGame();return;}
+  currentQ=questions[qIndex];
+  document.getElementById('questionDisplay').textContent=currentQ.q;
+  document.getElementById('questionNum').textContent=qIndex+1;
+  document.getElementById('progressBar').style.width=((qIndex/30)*100)+'%';
+  spawnAsteroids(currentQ);
+  waitingForNext=false;
+}
+
+function handleHit(ast){
+  if(!ast.active||waitingForNext)return;
+  const correct=ast.answerIndex===currentQ.a;
+  ast.active=false;
+  if(correct){
+    ast.hit='correct'; score+=100; playCorrect();
+    spawnParticles(ast.x,ast.y,'#00ffa0');
+    flashMessage='✓ RÄTT!'; flashAlpha=1;
+    document.getElementById('scoreDisplay').textContent=score;
+  } else {
+    ast.hit='wrong'; lives--; playWrong();
+    spawnParticles(ast.x,ast.y,'#ff4488');
+    flashMessage='✗ FEL'; flashAlpha=1;
+    document.getElementById('livesDisplay').textContent=lives;
+    missedQuestions.push({...currentQ,yourAnswer:currentQ.opts[ast.answerIndex]});
+  }
+  asteroids.forEach(a=>{if(a!==ast)a.active=false;});
+  waitingForNext=true; nextTimer=90;
+  if(lives<=0){setTimeout(endGame,1500);return;}
+  qIndex++;
+}
+
+function gameLoop(){
+  if(!gameActive)return;
+  const W=canvas.width,H=canvas.height;
+  gctx.fillStyle='#03010a'; gctx.fillRect(0,0,W,H);
+  gameStars.forEach(s=>{
+    s.y+=s.speed; if(s.y>H){s.y=0;s.x=Math.random()*W;}
+    gctx.globalAlpha=s.alpha; gctx.fillStyle='#c8dcff';
+    gctx.beginPath(); gctx.arc(s.x,s.y,s.r,0,Math.PI*2); gctx.fill();
+  });
+  gctx.globalAlpha=1;
+  particles=particles.filter(p=>p.life>0);
+  particles.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.1;p.life-=0.025;p.alpha=p.life;
+    gctx.globalAlpha=p.alpha;gctx.fillStyle=p.color;
+    gctx.beginPath();gctx.arc(p.x,p.y,p.r,0,Math.PI*2);gctx.fill();
+  });
+  gctx.globalAlpha=1;
+  bullets=bullets.filter(b=>b.active&&b.y>-10);
+  bullets.forEach(b=>{
+    b.y-=b.speed;
+    asteroids.forEach(ast=>{
+      if(!ast.active)return;
+      const dx=b.x-ast.x,dy=b.y-ast.y;
+      if(Math.sqrt(dx*dx+dy*dy)<ast.r){b.active=false;handleHit(ast);}
+    });
+    if(!b.active)return;
+    gctx.save();gctx.shadowColor='#00f5ff';gctx.shadowBlur=12;
+    const g=gctx.createLinearGradient(b.x,b.y-18,b.x,b.y+4);
+    g.addColorStop(0,'rgba(0,245,255,0)');g.addColorStop(0.4,'rgba(0,245,255,0.9)');g.addColorStop(1,'#ffffff');
+    gctx.fillStyle=g;gctx.fillRect(b.x-2,b.y-18,4,20);gctx.restore();
+  });
+  asteroids.forEach(ast=>{
+    if(!waitingForNext&&ast.active){
+      ast.y+=ast.vy;
+      if(ast.y>canvas.height+ast.r){
+        ast.active=false;
+        if(ast.answerIndex===currentQ.a){
+          lives--;playWrong();
+          document.getElementById('livesDisplay').textContent=lives;
+          missedQuestions.push({...currentQ,yourAnswer:'(ingen träff)'});
+          flashMessage='⚠ FÖRBI!';flashAlpha=1;
+          asteroids.forEach(a=>{if(a!==ast)a.active=false;});
+          waitingForNext=true;nextTimer=90;qIndex++;
+          if(lives<=0)setTimeout(endGame,1500);
+        }
+      }
+    }
+    if(ast.hit)ast.hitAlpha-=0.02;
+    drawAsteroid(gctx,ast);
+  });
+  if(waitingForNext){nextTimer--;if(nextTimer<=0)loadQuestion();}
+  if(flashAlpha>0){
+    gctx.save();gctx.globalAlpha=flashAlpha;
+    gctx.font="bold 36px 'Orbitron',sans-serif";gctx.textAlign='center';
+    const isOk=flashMessage&&flashMessage.includes('RÄTT');
+    gctx.fillStyle=isOk?'#00ffa0':'#ff4488';
+    gctx.shadowColor=gctx.fillStyle;gctx.shadowBlur=20;
+    gctx.fillText(flashMessage,W/2,H/2-30);gctx.restore();
+    flashAlpha-=0.015;
+  }
+  drawShip(gctx,ship.x,ship.y);
+  animFrame=requestAnimationFrame(gameLoop);
+}
+
+function drawShip(ctx,x,y){
+  ctx.save();ctx.translate(x,y);
+  const eg=ctx.createRadialGradient(0,22,2,0,22,22);
+  eg.addColorStop(0,'rgba(0,200,255,0.8)');eg.addColorStop(1,'rgba(0,100,255,0)');
+  ctx.fillStyle=eg;ctx.fillRect(-20,10,40,30);
+  const fh=15+Math.sin(Date.now()*0.02)*5;
+  const fl=ctx.createLinearGradient(0,20,0,20+fh);
+  fl.addColorStop(0,'#00f5ff');fl.addColorStop(0.5,'#0040ff');fl.addColorStop(1,'rgba(0,40,200,0)');
+  ctx.fillStyle=fl;ctx.beginPath();ctx.moveTo(-10,20);ctx.lineTo(0,20+fh);ctx.lineTo(10,20);ctx.closePath();ctx.fill();
+  const bg=ctx.createLinearGradient(-30,-30,30,30);
+  bg.addColorStop(0,'#1a4fff');bg.addColorStop(0.5,'#0a2acc');bg.addColorStop(1,'#cc0033');
+  ctx.fillStyle=bg;ctx.beginPath();ctx.moveTo(0,-28);ctx.lineTo(22,18);ctx.lineTo(10,12);ctx.lineTo(0,16);ctx.lineTo(-10,12);ctx.lineTo(-22,18);ctx.closePath();ctx.fill();
+  ctx.strokeStyle='#ff0033';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(0,-20);ctx.lineTo(15,14);ctx.moveTo(0,-20);ctx.lineTo(-15,14);ctx.stroke();
+  const cg=ctx.createRadialGradient(-3,-12,1,0,-8,9);
+  cg.addColorStop(0,'#80d4ff');cg.addColorStop(1,'#0060cc');
+  ctx.fillStyle=cg;ctx.beginPath();ctx.ellipse(0,-8,9,12,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='rgba(20,60,200,0.9)';
+  ctx.beginPath();ctx.moveTo(-22,18);ctx.lineTo(-40,22);ctx.lineTo(-28,8);ctx.lineTo(-10,10);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(22,18);ctx.lineTo(40,22);ctx.lineTo(28,8);ctx.lineTo(10,10);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#cc0033';
+  ctx.beginPath();ctx.arc(-32,20,4,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(32,20,4,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+
+function prepareUltimate() {
+  const allRaw = RAW_SECTORS.flatMap(s => s.qs);
+  return shuffle(allRaw).slice(0, 30).map(item => {
+    const opts = shuffle([{text:item.correct,isCorrect:true},{text:item.wrong1,isCorrect:false},{text:item.wrong2,isCorrect:false}]);
+    const correctIdx = opts.findIndex(o => o.isCorrect);
+    return { q:item.q, opts:opts.map(o=>o.text), a:correctIdx, exp:item.exp };
+  });
+}
+
+// ===================== GAME FLOW =====================
+function startUltimate(){
+  initAudio();
+  currentSector=4;
+  questions=prepareUltimate();
+  qIndex=0;score=0;lives=3;missedQuestions=[];
+  document.getElementById('startScreen').style.display='none';
+  document.getElementById('reportScreen').style.display='none';
+  canvas.style.display='block';
+  document.getElementById('hud').classList.add('active');
+  document.getElementById('questionDisplay').classList.add('active');
+  document.getElementById('scoreDisplay').textContent=0;
+  document.getElementById('livesDisplay').textContent=3;
+  initGameCanvas();gameActive=true;loadQuestion();gameLoop();
+}
+
+function startSector(idx){
+  initAudio();
+  currentSector=idx;
+  questions=prepareQuestions(idx);
+  qIndex=0;score=0;lives=3;missedQuestions=[];
+  document.getElementById('startScreen').style.display='none';
+  document.getElementById('reportScreen').style.display='none';
+  canvas.style.display='block';
+  document.getElementById('hud').classList.add('active');
+  document.getElementById('questionDisplay').classList.add('active');
+  document.getElementById('scoreDisplay').textContent=0;
+  document.getElementById('livesDisplay').textContent=3;
+  initGameCanvas();gameActive=true;loadQuestion();gameLoop();
+}
+
+function endGame(){
+  gameActive=false;if(animFrame)cancelAnimationFrame(animFrame);
+  canvas.style.display='none';
+  document.getElementById('hud').classList.remove('active');
+  document.getElementById('questionDisplay').classList.remove('active');
+  showReport();
+}
+
+function showReport(){
+  const total=Math.min(qIndex,30),correct=total-missedQuestions.length;
+  document.getElementById('reportStats').innerHTML=`
+    <div class="stat-box correct"><span class="stat-num">${correct}</span><div class="stat-label">RÄTT SVAR</div></div>
+    <div class="stat-box wrong"><span class="stat-num">${missedQuestions.length}</span><div class="stat-label">MISSADE</div></div>
+    <div class="stat-box score"><span class="stat-num">${score}</span><div class="stat-label">POÄNG</div></div>`;
+  let html='';
+  if(missedQuestions.length===0){html=`<div style="text-align:center;color:var(--neon-green);font-size:1.1rem;padding:20px;">🎉 Perfekt resultat! Inga missade frågor.</div>`;}
+  else{
+    html=`<div class="missed-title">📌 Missade begrepp – förklaringar</div>`;
+    missedQuestions.forEach(mq=>{
+      html+=`<div class="missed-item"><div class="missed-q">❓ ${mq.q}</div><div class="missed-your">✗ Ditt svar: ${mq.yourAnswer}</div><div class="missed-correct">✓ Rätt svar: ${mq.opts[mq.a]}</div><div class="missed-explain">💡 ${mq.exp}</div></div>`;
+    });
+  }
+  document.getElementById('reportMissed').innerHTML=html;
+  document.getElementById('reportScreen').style.display='flex';
+  initStars('bgStars2');
+}
+
+function showStart(){
+  document.getElementById('reportScreen').style.display='none';
+  document.getElementById('startScreen').style.display='flex';
+}
+
+window.addEventListener('load',()=>initStars('bgStars'));
+window.addEventListener('resize',()=>{if(gameActive){canvas.width=window.innerWidth;canvas.height=window.innerHeight;ship.y=canvas.height-90;}});
+</script>
+</body>
+</html>
