@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BUZZER</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Barlow+Condensed:wght@400;700;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green:  #22c55e;
+    --green-dark: #15803d;
+    --green-glow: #22c55e88;
+    --blue:   #3b82f6;
+    --blue-dark: #1d4ed8;
+    --blue-glow: #3b82f688;
+    --yellow: #eab308;
+    --yellow-dark: #a16207;
+    --yellow-glow: #eab30888;
+    --red:    #ef4444;
+    --red-dark: #b91c1c;
+    --red-glow: #ef444488;
+  }
+
+  body {
+    background: #0a0a0f;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    overflow: hidden;
+  }
+
+  /* === CHOOSE SCREEN === */
+  #choose-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 20px;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .choose-title {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(2.4rem, 8vw, 3.6rem);
+    letter-spacing: 0.25em;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0;
+    animation: fadeDown 0.5s 0.1s forwards;
+  }
+
+  .choose-sub {
+    font-size: 1.1rem;
+    letter-spacing: 0.2em;
+    color: #666;
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeDown 0.5s 0.2s forwards;
+    margin-top: -30px;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    opacity: 0;
+    animation: fadeUp 0.5s 0.3s forwards;
+  }
+
+  .team-btn {
+    position: relative;
+    padding: 28px 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #fff;
+    outline: none;
+    transition: transform 0.12s, box-shadow 0.12s;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+  }
+
+  .team-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.12);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .team-btn:active::before { opacity: 1; }
+  .team-btn:active { transform: scale(0.96); }
+
+  .team-btn[data-color="green"]  { background: var(--green-dark); box-shadow: 0 0 30px var(--green-glow), inset 0 1px 0 rgba(255,255,255,0.2); }
+  .team-btn[data-color="blue"]   { background: var(--blue-dark);  box-shadow: 0 0 30px var(--blue-glow),  inset 0 1px 0 rgba(255,255,255,0.2); }
+  .team-btn[data-color="yellow"] { background: var(--yellow-dark); box-shadow: 0 0 30px var(--yellow-glow), inset 0 1px 0 rgba(255,255,255,0.2); color: #1a1200; }
+  .team-btn[data-color="red"]    { background: var(--red-dark);   box-shadow: 0 0 30px var(--red-glow),   inset 0 1px 0 rgba(255,255,255,0.2); }
+
+  .team-emoji { display: block; font-size: 2.4rem; margin-bottom: 6px; font-family: initial; }
+
+  /* === BUZZER SCREEN === */
+  #buzzer-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    gap: 0;
+    position: relative;
+  }
+
+  .lag-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    position: absolute;
+    top: 28px;
+  }
+
+  .back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.35);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .back-btn:hover { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.4); }
+
+  /* The big buzzer */
+  .buzzer-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .buzzer {
+    position: relative;
+    width: min(72vw, 72vh, 380px);
+    height: min(72vw, 72vh, 380px);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.08s;
+    user-select: none;
+  }
+
+  .buzzer-inner {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    transition: transform 0.08s, box-shadow 0.08s;
+  }
+
+  .buzzer-text {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(2rem, 8vw, 3.2rem);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    pointer-events: none;
+  }
+
+  .buzzer-icon {
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    pointer-events: none;
+    font-family: initial;
+  }
+
+  /* Color-specific buzzer styles */
+  .buzzer[data-color="green"] .buzzer-inner {
+    background: radial-gradient(circle at 35% 35%, #4ade80, var(--green-dark) 70%);
+    box-shadow: 0 10px 0 #0d4a23, 0 14px 40px rgba(0,0,0,0.6), 0 0 80px var(--green-glow);
+  }
+  .buzzer[data-color="blue"] .buzzer-inner {
+    background: radial-gradient(circle at 35% 35%, #60a5fa, var(--blue-dark) 70%);
+    box-shadow: 0 10px 0 #0f2f7a, 0 14px 40px rgba(0,0,0,0.6), 0 0 80px var(--blue-glow);
+  }
+  .buzzer[data-color="yellow"] .buzzer-inner {
+    background: radial-gradient(circle at 35% 35%, #fde047, var(--yellow-dark) 70%);
+    box-shadow: 0 10px 0 #5a3800, 0 14px 40px rgba(0,0,0,0.6), 0 0 80px var(--yellow-glow);
+  }
+  .buzzer[data-color="yellow"] .buzzer-text { color: rgba(30,15,0,0.85); }
+  .buzzer[data-color="red"] .buzzer-inner {
+    background: radial-gradient(circle at 35% 35%, #f87171, var(--red-dark) 70%);
+    box-shadow: 0 10px 0 #6b0f0f, 0 14px 40px rgba(0,0,0,0.6), 0 0 80px var(--red-glow);
+  }
+
+  /* pressed state */
+  .buzzer:active .buzzer-inner,
+  .buzzer.pressed .buzzer-inner {
+    transform: translateY(8px);
+  }
+  .buzzer[data-color="green"].pressed .buzzer-inner { box-shadow: 0 2px 0 #0d4a23, 0 4px 20px rgba(0,0,0,0.5), 0 0 120px var(--green-glow); }
+  .buzzer[data-color="blue"].pressed .buzzer-inner  { box-shadow: 0 2px 0 #0f2f7a, 0 4px 20px rgba(0,0,0,0.5), 0 0 120px var(--blue-glow); }
+  .buzzer[data-color="yellow"].pressed .buzzer-inner{ box-shadow: 0 2px 0 #5a3800, 0 4px 20px rgba(0,0,0,0.5), 0 0 120px var(--yellow-glow); }
+  .buzzer[data-color="red"].pressed .buzzer-inner   { box-shadow: 0 2px 0 #6b0f0f, 0 4px 20px rgba(0,0,0,0.5), 0 0 120px var(--red-glow); }
+
+  /* Background flash */
+  #flash {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.05s;
+  }
+
+  #flash.show { opacity: 0.18; transition: opacity 0s; }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div id="flash"></div>
+
+<!-- CHOOSE SCREEN -->
+<div id="choose-screen">
+  <div>
+    <h1 class="choose-title">Buzzer</h1>
+    <p class="choose-sub">Välj ditt lag</p>
+  </div>
+  <div class="team-grid">
+    <button class="team-btn" data-color="green" onclick="startBuzzer('green')">
+      <span class="team-emoji">🟢</span>Grönt
+    </button>
+    <button class="team-btn" data-color="blue" onclick="startBuzzer('blue')">
+      <span class="team-emoji">🔵</span>Blått
+    </button>
+    <button class="team-btn" data-color="yellow" onclick="startBuzzer('yellow')">
+      <span class="team-emoji">🟡</span>Gult
+    </button>
+    <button class="team-btn" data-color="red" onclick="startBuzzer('red')">
+      <span class="team-emoji">🔴</span>Rött
+    </button>
+  </div>
+</div>
+
+<!-- BUZZER SCREEN -->
+<div id="buzzer-screen">
+  <button class="back-btn" onclick="goBack()">← Byt lag</button>
+  <span class="lag-label" id="lag-label">Lag</span>
+  <div class="buzzer-wrap">
+    <button class="buzzer" id="buzzer" onpointerdown="buzz()" onpointerup="releaseBuzz()" onpointerleave="releaseBuzz()">
+      <div class="buzzer-inner">
+        <span class="buzzer-icon" id="buzzer-icon">🔔</span>
+        <span class="buzzer-text">BUZZ!</span>
+      </div>
+    </button>
+  </div>
+</div>
+
+<script>
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+const sounds = {
+  green: () => {
+    // Bright ascending chime
+    const t = ctx.currentTime;
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, t + i * 0.07);
+      g.gain.setValueAtTime(0, t + i * 0.07);
+      g.gain.linearRampToValueAtTime(0.3, t + i * 0.07 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.07 + 0.4);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t + i * 0.07); o.stop(t + i * 0.07 + 0.5);
+    });
+  },
+  blue: () => {
+    // Sci-fi two-tone blip
+    const t = ctx.currentTime;
+    [440, 880].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'square';
+      o.frequency.setValueAtTime(freq, t + i * 0.12);
+      o.frequency.exponentialRampToValueAtTime(freq * 0.7, t + i * 0.12 + 0.18);
+      g.gain.setValueAtTime(0.18, t + i * 0.12);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.12 + 0.22);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t + i * 0.12); o.stop(t + i * 0.12 + 0.3);
+    });
+  },
+  yellow: () => {
+    // Energetic buzzer / game-show horn
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const o2 = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(180, t);
+    o.frequency.setValueAtTime(160, t + 0.1);
+    o.frequency.setValueAtTime(180, t + 0.2);
+    o2.type = 'sawtooth';
+    o2.frequency.setValueAtTime(181.5, t);
+    g.gain.setValueAtTime(0.25, t);
+    g.gain.setValueAtTime(0.25, t + 0.28);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+    o.connect(g); o2.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + 0.5);
+    o2.start(t); o2.stop(t + 0.5);
+  },
+  red: () => {
+    // Alarm — descending siren burst
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(880, t);
+    o.frequency.exponentialRampToValueAtTime(440, t + 0.18);
+    o.frequency.setValueAtTime(880, t + 0.25);
+    o.frequency.exponentialRampToValueAtTime(440, t + 0.43);
+    g.gain.setValueAtTime(0.28, t);
+    g.gain.setValueAtTime(0.28, t + 0.42);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + 0.6);
+  }
+};
+
+const colors = {
+  green:  { label: 'Grönt lag',  emoji: '🏆', bg: '#0d2a18' },
+  blue:   { label: 'Blått lag',  emoji: '⚡', bg: '#0d1a3a' },
+  yellow: { label: 'Gult lag',   emoji: '🌟', bg: '#2a1e00' },
+  red:    { label: 'Rött lag',   emoji: '🔥', bg: '#2a0d0d' }
+};
+
+let currentColor = null;
+
+function startBuzzer(color) {
+  currentColor = color;
+  const cfg = colors[color];
+
+  document.getElementById('buzzer-screen').style.background = cfg.bg;
+  document.getElementById('lag-label').textContent = cfg.label;
+  document.getElementById('buzzer-icon').textContent = cfg.emoji;
+  document.getElementById('buzzer').setAttribute('data-color', color);
+  document.getElementById('flash').style.background = `var(--${color})`;
+
+  document.getElementById('choose-screen').style.display = 'none';
+  document.getElementById('buzzer-screen').style.display = 'flex';
+
+  // Resume audio context (browsers require user gesture)
+  ctx.resume();
+}
+
+function goBack() {
+  document.getElementById('buzzer-screen').style.display = 'none';
+  document.getElementById('choose-screen').style.display = 'flex';
+}
+
+let canBuzz = true;
+
+function buzz() {
+  if (!canBuzz) return;
+  canBuzz = false;
+  ctx.resume().then(() => sounds[currentColor]());
+
+  const buzzer = document.getElementById('buzzer');
+  const flash = document.getElementById('flash');
+  buzzer.classList.add('pressed');
+  flash.classList.add('show');
+
+  setTimeout(() => flash.classList.remove('show'), 120);
+}
+
+function releaseBuzz() {
+  document.getElementById('buzzer').classList.remove('pressed');
+  setTimeout(() => { canBuzz = true; }, 300);
+}
+</script>
+</body>
+</html>
