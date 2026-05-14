@@ -155,6 +155,12 @@
   .combo-option.new-kat{color:var(--orange);font-style:italic;}
   .cat-filter-btn{border:1.5px solid var(--border);background:var(--card);padding:4px 14px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.82rem;cursor:pointer;color:var(--ink2);transition:all 0.18s;}
   .cat-filter-btn.active{background:var(--green);border-color:var(--green);color:#fff;}
+  .sync-bar{position:fixed;bottom:20px;right:20px;background:var(--ink);color:#fff;padding:10px 18px;border-radius:50px;font-size:0.82rem;font-weight:500;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(8px);transition:opacity 0.2s,transform 0.2s;pointer-events:none;z-index:999;}
+  .sync-bar.show{opacity:1;transform:translateY(0);}
+  .sync-bar.ok{background:var(--green);}
+  .sync-bar.err{background:var(--danger);}
+  .sync-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.5);animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
   .empty-msg{color:var(--ink2);font-size:0.9rem;text-align:center;padding:32px 0;}
   .status-msg{color:var(--ink2);font-size:0.9rem;text-align:center;padding:32px 0;}
 
@@ -258,12 +264,13 @@
       <div id="statContent"><div class="spinner-wrap"><div class="spinner"></div></div></div>
     </div>
   </div>
+  <div class="sync-bar" id="syncBar"><div class="sync-dot" id="syncDot"></div><span id="syncText">Sparar…</span></div>
 </main>
 
 <footer>Quizr &nbsp;·&nbsp; Göinge utbildningscenter &nbsp;·&nbsp; Skapad av Adam Kedert &nbsp;·&nbsp; Vibekodad med Claude (Anthropic)</footer>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbxCYp8lS4IXEL-M_ZDrvM3qUHjEOH9UNG3MElyFmCHnBQ1Y5t8vvgeycs8nmYHBnDYdDA/exec";
+const API = "https://script.google.com/macros/s/AKfycbxEZFZhuuulLUeDH1CpspKNShTykj_GS3Snk1aKO1TwAvUyvwKlBtkvJGUzUhvuX1QVHA/exec";
 const PASSWORD = "v\u00e4nligkvartersspindel";
 
 let allFragor=[], allStats={};
@@ -396,15 +403,24 @@ async function sparaEdit(gammaltBegrepp) {
   const nyttForklaring=document.getElementById("ef-"+esc(gammaltBegrepp)).value.trim();
   const nyttKategori =document.getElementById("ek-"+esc(gammaltBegrepp)).value.trim();
   if(!nyttBegrepp||!nyttForklaring){alert("Begrepp och förklaring får inte vara tomma.");return;}
+
+  // Optimistisk uppdatering
+  const backup=[...allFragor];
+  const idx=allFragor.findIndex(f=>f.begrepp===gammaltBegrepp&&f.niva===selectedBegreppNiva);
+  if(idx>-1) allFragor[idx]={begrepp:nyttBegrepp,forklaring:nyttForklaring,kategori:nyttKategori,niva:selectedBegreppNiva};
+  renderKatFilter(); renderBegreppList(); updateKategoriList();
+
+  syncStart();
   try {
     const res=await fetch(API,{method:"POST",body:JSON.stringify({action:"editBegrepp",gammaltBegrepp,nyttBegrepp,nyttForklaring,nyttKategori,niva:selectedBegreppNiva}),headers:{"Content-Type":"text/plain"}});
     const data=await res.json();
-    if(data.ok){
-      const idx=allFragor.findIndex(f=>f.begrepp===gammaltBegrepp&&f.niva===selectedBegreppNiva);
-      if(idx>-1) allFragor[idx]={begrepp:nyttBegrepp,forklaring:nyttForklaring,kategori:nyttKategori,niva:selectedBegreppNiva};
-      renderKatFilter(); renderBegreppList(); updateKategoriList();
-    }
-  } catch(e){alert("Kunde inte spara. Försök igen.");}
+    if(!data.ok) throw new Error();
+    syncDone(true);
+  } catch(e){
+    syncDone(false);
+    allFragor=backup;
+    renderKatFilter(); renderBegreppList();
+  }
 }
 
 function getKats() {
@@ -465,30 +481,49 @@ async function laggTillBegrepp(){
   const kategori=document.getElementById("newKategori").value.trim();
   if(!begrepp||!forklaring){alert("Fyll i begrepp och förklaring.");return;}
   if(!selectedBegreppNiva){alert("Välj en nivå.");return;}
-  const btn=document.getElementById("addBtn"); btn.disabled=true;
+
+  // Optimistisk uppdatering — visa direkt
+  allFragor.push({begrepp,forklaring,kategori,niva:selectedBegreppNiva});
+  document.getElementById("newBegrepp").value="";
+  document.getElementById("newForklaring").value="";
+  document.getElementById("newKategori").value="";
+  renderKatFilter(); renderBegreppList(); updateKategoriList();
+  const msg=document.getElementById("saveMsg"); msg.classList.add("show");
+  setTimeout(()=>msg.classList.remove("show"),2500);
+
+  // Spara till Sheets i bakgrunden
+  syncStart();
   try {
     const res=await fetch(API,{method:"POST",body:JSON.stringify({action:"addBegrepp",begrepp,forklaring,kategori,niva:selectedBegreppNiva}),headers:{"Content-Type":"text/plain"}});
     const data=await res.json();
-    if(data.ok){
-      allFragor.push({begrepp,forklaring,kategori,niva:selectedBegreppNiva});
-      document.getElementById("newBegrepp").value="";
-      document.getElementById("newForklaring").value="";
-      document.getElementById("newKategori").value="";
-      renderKatFilter(); renderBegreppList(); updateKategoriList();
-      const msg=document.getElementById("saveMsg"); msg.classList.add("show");
-      setTimeout(()=>msg.classList.remove("show"),2500);
-    }
-  } catch(e){alert("Något gick fel.");}
-  btn.disabled=false;
+    if(!data.ok) throw new Error();
+    syncDone(true);
+  } catch(e){
+    syncDone(false);
+    allFragor=allFragor.filter(f=>!(f.begrepp===begrepp&&f.niva===selectedBegreppNiva));
+    renderKatFilter(); renderBegreppList();
+  }
 }
 
 async function taBortBegrepp(begrepp){
   if(!confirm(`Ta bort "${begrepp}" från ${selectedBegreppNiva}?`))return;
+
+  // Optimistisk uppdatering
+  const backup=[...allFragor];
+  allFragor=allFragor.filter(f=>!(f.begrepp===begrepp&&f.niva===selectedBegreppNiva));
+  renderKatFilter(); renderBegreppList();
+
+  syncStart();
   try {
     const res=await fetch(API,{method:"POST",body:JSON.stringify({action:"deleteBegrepp",begrepp,niva:selectedBegreppNiva}),headers:{"Content-Type":"text/plain"}});
     const data=await res.json();
-    if(data.ok){allFragor=allFragor.filter(f=>!(f.begrepp===begrepp&&f.niva===selectedBegreppNiva));renderKatFilter();renderBegreppList();}
-  } catch(e){alert("Kunde inte ta bort.");}
+    if(!data.ok) throw new Error();
+    syncDone(true);
+  } catch(e){
+    syncDone(false);
+    allFragor=backup;
+    renderKatFilter(); renderBegreppList();
+  }
 }
 
 // ---- IMPORT ----
@@ -604,6 +639,37 @@ function renderStatistik(){
       </table>
     </div>`;
 }
+// ---- SYNC QUEUE ----
+let syncPending = 0;
+let syncTimer = null;
+
+function syncStart() {
+  syncPending++;
+  const bar = document.getElementById("syncBar");
+  bar.className = "sync-bar show";
+  document.getElementById("syncDot").style.display = "block";
+  document.getElementById("syncText").textContent = syncPending > 1 ? `Sparar ${syncPending} ändringar…` : "Sparar…";
+  clearTimeout(syncTimer);
+}
+
+function syncDone(ok) {
+  syncPending = Math.max(0, syncPending - 1);
+  if (syncPending > 0) {
+    document.getElementById("syncText").textContent = `Sparar ${syncPending} ändringar…`;
+    return;
+  }
+  const bar = document.getElementById("syncBar");
+  document.getElementById("syncDot").style.display = "none";
+  if (ok) {
+    bar.className = "sync-bar show ok";
+    document.getElementById("syncText").textContent = "✓ Sparat i Sheets";
+  } else {
+    bar.className = "sync-bar show err";
+    document.getElementById("syncText").textContent = "⚠ Fel — kontrollera Sheets";
+  }
+  syncTimer = setTimeout(() => { bar.className = "sync-bar"; }, 3000);
+}
+
 </script>
 </body>
 </html>
