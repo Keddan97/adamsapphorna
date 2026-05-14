@@ -5,135 +5,154 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quizr – Lärarvy</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
-    --green:       #568E14;
-    --green-dark:  #3A6409;
-    --green-mid:   #7CB52A;
-    --green-light: #D4EDAA;
-    --green-pale:  #EFF7E0;
-    --orange:      #DD5900;
-    --orange-pale: #FDEEE5;
-    --n1:          #cc3947;
-    --n2:          #65337c;
-    --n3:          #2c9aa6;
-    --bg:          #F8FCF2;
-    --card:        #FFFFFF;
-    --ink:         #1A2410;
-    --ink2:        #556040;
-    --border:      #C6DCA0;
-    --radius:      14px;
-    --danger:      #c0392b;
-    --danger-pale: #fdecea;
+    --green:#568E14; --green-dark:#3A6409; --green-mid:#7CB52A;
+    --green-light:#D4EDAA; --green-pale:#EFF7E0;
+    --orange:#DD5900; --orange-pale:#FDEEE5;
+    --n1:#cc3947; --n2:#65337c; --n3:#2c9aa6;
+    --bg:#F8FCF2; --card:#FFFFFF; --ink:#1A2410; --ink2:#556040;
+    --border:#C6DCA0; --radius:14px; --danger:#c0392b; --danger-pale:#fdecea;
   }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:'Source Sans 3',sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; display:flex; flex-direction:column; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Source Sans 3',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
 
-  /* HEADER */
-  header { background:var(--green); padding:0 24px; display:flex; align-items:center; gap:14px; height:64px; flex-shrink:0; }
-  .header-title { font-family:'Bebas Neue',sans-serif; font-size:2.2rem; color:#fff; letter-spacing:2px; line-height:1; margin-top:2px; }
-  .header-divider { width:1px; height:32px; background:rgba(255,255,255,0.3); }
-  .header-sub { color:rgba(255,255,255,0.85); font-size:0.88rem; font-weight:500; }
-  .header-spacer { flex:1; }
-  .logout-btn { border:1.5px solid rgba(255,255,255,0.4); background:none; color:#fff; padding:6px 16px; border-radius:50px; font-family:'Source Sans 3',sans-serif; font-size:0.82rem; cursor:pointer; transition:background 0.15s; }
-  .logout-btn:hover { background:rgba(255,255,255,0.15); }
+  header{background:var(--green);padding:0 24px;display:flex;align-items:center;gap:14px;height:64px;flex-shrink:0;}
+  .header-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#fff;letter-spacing:2px;line-height:1;margin-top:2px;cursor:pointer;}
+  .header-divider{width:1px;height:32px;background:rgba(255,255,255,0.3);}
+  .header-sub{color:rgba(255,255,255,0.85);font-size:0.88rem;font-weight:500;}
+  .header-spacer{flex:1;}
+  .logout-btn{border:1.5px solid rgba(255,255,255,0.4);background:none;color:#fff;padding:6px 16px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.82rem;cursor:pointer;transition:background 0.15s;}
+  .logout-btn:hover{background:rgba(255,255,255,0.15);}
 
-  main { flex:1; display:flex; flex-direction:column; align-items:center; padding:32px 16px 64px; }
+  main{flex:1;display:flex;flex-direction:column;align-items:center;padding:32px 16px 64px;}
 
   /* LOGIN */
-  .login-card { width:100%; max-width:400px; background:var(--card); border:1.5px solid var(--border); border-top:4px solid var(--green); border-radius:var(--radius); padding:40px 36px; text-align:center; margin-top:48px; }
-  .login-card h2 { font-size:1.3rem; font-weight:600; margin-bottom:8px; }
-  .login-card p { font-size:0.88rem; color:var(--ink2); margin-bottom:28px; }
-  .login-input { width:100%; border:1.5px solid var(--border); background:var(--bg); padding:11px 14px; border-radius:10px; font-family:'Source Sans 3',sans-serif; font-size:0.95rem; color:var(--ink); margin-bottom:12px; outline:none; transition:border-color 0.15s; }
-  .login-input:focus { border-color:var(--green); }
-  .login-btn { width:100%; border:none; background:var(--green); color:#fff; padding:13px; border-radius:50px; font-family:'Source Sans 3',sans-serif; font-size:0.95rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; }
-  .login-btn:hover { opacity:0.87; }
-  .login-error { color:var(--danger); font-size:0.85rem; margin-bottom:10px; display:none; }
+  .login-card{width:100%;max-width:400px;background:var(--card);border:1.5px solid var(--border);border-top:4px solid var(--green);border-radius:var(--radius);padding:40px 36px;text-align:center;margin-top:48px;}
+  .login-card h2{font-size:1.3rem;font-weight:600;margin-bottom:8px;}
+  .login-card p{font-size:0.88rem;color:var(--ink2);margin-bottom:28px;}
+  .login-error{color:var(--danger);font-size:0.85rem;margin-bottom:10px;display:none;}
+  .login-input{width:100%;border:1.5px solid var(--border);background:var(--bg);padding:11px 14px;border-radius:10px;font-family:'Source Sans 3',sans-serif;font-size:0.95rem;color:var(--ink);margin-bottom:12px;outline:none;transition:border-color 0.15s;}
+  .login-input:focus{border-color:var(--green);}
+  .login-btn{width:100%;border:none;background:var(--green);color:#fff;padding:13px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
+  .login-btn:hover{opacity:0.87;}
 
   /* TABS */
-  .tabs { display:flex; gap:6px; margin-bottom:28px; background:var(--card); border:1.5px solid var(--border); border-radius:50px; padding:4px; width:100%; max-width:720px; }
-  .tab-btn { flex:1; border:none; background:none; padding:9px 16px; border-radius:50px; font-family:'Source Sans 3',sans-serif; font-size:0.92rem; font-weight:500; cursor:pointer; color:var(--ink2); transition:all 0.2s; }
-  .tab-btn.active { background:var(--green); color:#fff; }
+  .tabs{display:flex;gap:6px;margin-bottom:28px;background:var(--card);border:1.5px solid var(--border);border-radius:50px;padding:4px;width:100%;max-width:760px;}
+  .tab-btn{flex:1;border:none;background:none;padding:9px 16px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.92rem;font-weight:500;cursor:pointer;color:var(--ink2);transition:all 0.2s;}
+  .tab-btn.active{background:var(--green);color:#fff;}
 
-  /* SECTION */
-  .section { width:100%; max-width:720px; display:none; }
-  .section.active { display:block; }
+  .section{width:100%;max-width:760px;display:none;}
+  .section.active{display:block;}
 
   /* LEVEL SELECTOR */
-  .level-selector { display:flex; gap:8px; margin-bottom:24px; flex-wrap:wrap; }
-  .level-btn { border:2px solid var(--border); background:var(--card); padding:8px 20px; border-radius:50px; font-family:'Source Sans 3',sans-serif; font-size:0.88rem; font-weight:500; cursor:pointer; color:var(--ink2); transition:all 0.18s; }
-  .level-btn.active { color:#fff; border-color:transparent; }
-  .level-btn[data-niva="Nivå 1"].active { background:var(--n1); }
-  .level-btn[data-niva="Nivå 2"].active { background:var(--n2); }
-  .level-btn[data-niva="Nivå 3"].active { background:var(--n3); }
+  .level-selector{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+  .level-btn{border:2px solid var(--border);background:var(--card);padding:8px 20px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.88rem;font-weight:500;cursor:pointer;color:var(--ink2);transition:all 0.18s;}
+  .level-btn.active{color:#fff;border-color:transparent;}
+  .level-btn[data-niva="Nivå 1"].active{background:var(--n1);}
+  .level-btn[data-niva="Nivå 2"].active{background:var(--n2);}
+  .level-btn[data-niva="Nivå 3"].active{background:var(--n3);}
 
   /* CARD */
-  .card { background:var(--card); border:1.5px solid var(--border); border-radius:var(--radius); padding:24px 28px; margin-bottom:20px; }
-  .card h3 { font-size:1rem; font-weight:600; margin-bottom:16px; color:var(--ink); }
+  .card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:20px;}
+  .card h3{font-size:1rem;font-weight:600;margin-bottom:16px;color:var(--ink);}
 
   /* FORM */
-  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
-  .form-row.single { grid-template-columns:1fr; }
-  label { font-size:0.8rem; font-weight:600; color:var(--ink2); letter-spacing:0.5px; text-transform:uppercase; display:block; margin-bottom:4px; }
-  input[type=text], textarea, select {
-    width:100%; border:1.5px solid var(--border); background:var(--bg);
-    padding:10px 12px; border-radius:10px; font-family:'Source Sans 3',sans-serif;
-    font-size:0.93rem; color:var(--ink); outline:none; transition:border-color 0.15s;
-  }
-  input[type=text]:focus, textarea:focus, select:focus { border-color:var(--green); }
-  textarea { resize:vertical; min-height:80px; }
-  .btn-primary { border:none; background:var(--green); color:#fff; padding:11px 28px; border-radius:50px; font-family:'Source Sans 3',sans-serif; font-size:0.92rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; }
-  .btn-primary:hover { opacity:0.87; }
-  .btn-primary:disabled { opacity:0.4; cursor:default; }
-  .btn-danger { border:1.5px solid var(--danger); background:none; color:var(--danger); padding:6px 14px; border-radius:50px; font-family:'Source Sans 3',sans-serif; font-size:0.82rem; font-weight:500; cursor:pointer; transition:background 0.15s, color 0.15s; }
-  .btn-danger:hover { background:var(--danger); color:#fff; }
-  .save-msg { font-size:0.85rem; color:var(--green); margin-left:12px; opacity:0; transition:opacity 0.3s; }
-  .save-msg.show { opacity:1; }
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+  .form-row.single{grid-template-columns:1fr;}
+  label{font-size:0.8rem;font-weight:600;color:var(--ink2);letter-spacing:0.5px;text-transform:uppercase;display:block;margin-bottom:4px;}
+  input[type=text],textarea,select{width:100%;border:1.5px solid var(--border);background:var(--bg);padding:10px 12px;border-radius:10px;font-family:'Source Sans 3',sans-serif;font-size:0.93rem;color:var(--ink);outline:none;transition:border-color 0.15s;}
+  input[type=text]:focus,textarea:focus,select:focus{border-color:var(--green);}
+  textarea{resize:vertical;min-height:72px;}
+
+  .btn-primary{border:none;background:var(--green);color:#fff;padding:11px 28px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
+  .btn-primary:hover{opacity:0.87;}
+  .btn-primary:disabled{opacity:0.4;cursor:default;}
+  .btn-secondary{border:1.5px solid var(--border);background:none;color:var(--ink2);padding:9px 20px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.88rem;font-weight:500;cursor:pointer;transition:all 0.15s;}
+  .btn-secondary:hover{border-color:var(--green);color:var(--green);}
+  .btn-danger{border:1.5px solid var(--danger);background:none;color:var(--danger);padding:6px 14px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;transition:background 0.15s,color 0.15s;}
+  .btn-danger:hover{background:var(--danger);color:#fff;}
+  .btn-edit{border:1.5px solid var(--border);background:none;color:var(--ink2);padding:6px 14px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.82rem;font-weight:500;cursor:pointer;transition:all 0.15s;}
+  .btn-edit:hover{border-color:var(--green);color:var(--green);}
+
+  .save-msg{font-size:0.85rem;color:var(--green);margin-left:12px;opacity:0;transition:opacity 0.3s;}
+  .save-msg.show{opacity:1;}
 
   /* BEGREPP LIST */
-  .begrepp-list { margin-top:20px; }
-  .begrepp-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
-  .begrepp-item:last-child { border-bottom:none; }
-  .begrepp-text { flex:1; }
-  .begrepp-name { font-weight:600; font-size:0.95rem; color:var(--ink); }
-  .begrepp-forklaring { font-size:0.85rem; color:var(--ink2); margin-top:2px; line-height:1.4; }
-  .begrepp-kat { font-size:0.72rem; color:var(--orange); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-top:3px; }
-  .empty-msg { color:var(--ink2); font-size:0.9rem; text-align:center; padding:32px 0; }
+  .begrepp-list{margin-top:4px;}
+  .begrepp-item{padding:12px 0;border-bottom:1px solid var(--border);}
+  .begrepp-item:last-child{border-bottom:none;}
+  .begrepp-row{display:flex;align-items:flex-start;gap:12px;}
+  .begrepp-text{flex:1;}
+  .begrepp-name{font-weight:600;font-size:0.95rem;color:var(--ink);}
+  .begrepp-forklaring{font-size:0.85rem;color:var(--ink2);margin-top:2px;line-height:1.4;}
+  .begrepp-kat{font-size:0.72rem;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:3px;}
+  .begrepp-actions{display:flex;gap:6px;flex-shrink:0;}
+
+  /* EDIT FORM inline */
+  .edit-form{margin-top:12px;background:var(--green-pale);border:1px solid var(--green-light);border-radius:10px;padding:14px 16px;display:none;}
+  .edit-form.open{display:block;}
+  .edit-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .edit-row.single{grid-template-columns:1fr;}
+  .edit-label{font-size:0.75rem;font-weight:600;color:var(--ink2);letter-spacing:0.5px;text-transform:uppercase;display:block;margin-bottom:3px;}
+  .edit-input{width:100%;border:1.5px solid var(--border);background:#fff;padding:8px 10px;border-radius:8px;font-family:'Source Sans 3',sans-serif;font-size:0.88rem;color:var(--ink);outline:none;}
+  .edit-input:focus{border-color:var(--green);}
+  .edit-textarea{resize:vertical;min-height:60px;}
+  .edit-btns{display:flex;gap:8px;margin-top:4px;}
+
+  /* SEARCH */
+  .search-wrap{margin-bottom:14px;}
+  .search-input{width:100%;border:1.5px solid var(--border);background:var(--bg);padding:9px 14px;border-radius:50px;font-family:'Source Sans 3',sans-serif;font-size:0.9rem;color:var(--ink);outline:none;transition:border-color 0.15s;}
+  .search-input:focus{border-color:var(--green);}
+
+  /* IMPORT */
+  .import-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:32px 24px;text-align:center;cursor:pointer;transition:border-color 0.15s,background 0.15s;}
+  .import-zone:hover,.import-zone.drag{border-color:var(--green);background:var(--green-pale);}
+  .import-zone p{color:var(--ink2);font-size:0.9rem;margin-bottom:8px;}
+  .import-zone small{color:var(--ink2);font-size:0.78rem;opacity:0.7;}
+  input[type=file]{display:none;}
+
+  /* IMPORT PREVIEW */
+  .import-preview{margin-top:16px;display:none;}
+  .import-preview table{width:100%;border-collapse:collapse;font-size:0.85rem;}
+  .import-preview th{background:var(--green);color:#fff;padding:8px 12px;text-align:left;font-weight:600;}
+  .import-preview td{padding:8px 12px;border-bottom:1px solid var(--border);}
+  .import-preview tr:last-child td{border-bottom:none;}
+  .import-preview tr:nth-child(even) td{background:var(--green-pale);}
+  .import-msg{font-size:0.85rem;margin-top:10px;}
+  .import-msg.ok{color:var(--green);}
+  .import-msg.err{color:var(--danger);}
 
   /* STATISTIK */
-  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin-bottom:24px; }
-  .stat-card { background:var(--green-pale); border:1px solid var(--green-light); border-radius:var(--radius); padding:16px 20px; text-align:center; }
-  .stat-number { font-size:2rem; font-weight:600; color:var(--green); line-height:1; margin-bottom:4px; }
-  .stat-label { font-size:0.78rem; color:var(--ink2); font-weight:500; }
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+  .stat-card{background:var(--green-pale);border:1px solid var(--green-light);border-radius:var(--radius);padding:16px 20px;text-align:center;}
+  .stat-number{font-size:2rem;font-weight:600;color:var(--green);line-height:1;margin-bottom:4px;}
+  .stat-label{font-size:0.78rem;color:var(--ink2);font-weight:500;}
+  .stat-table{width:100%;border-collapse:collapse;font-size:0.88rem;}
+  .stat-table th{background:var(--green);color:#fff;padding:10px 14px;text-align:left;font-weight:600;font-size:0.8rem;letter-spacing:0.5px;}
+  .stat-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+  .stat-table tr:last-child td{border-bottom:none;}
+  .stat-table tr:nth-child(even){background:var(--green-pale);}
+  .pct-bar-wrap{display:flex;align-items:center;gap:8px;}
+  .pct-bar{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .pct-fill{height:100%;border-radius:3px;}
+  .pct-text{font-size:0.82rem;font-weight:600;min-width:36px;text-align:right;}
+  .badge-kat{font-size:0.72rem;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
 
-  /* STATISTIK TABELL */
-  .stat-table { width:100%; border-collapse:collapse; font-size:0.88rem; }
-  .stat-table th { background:var(--green); color:#fff; padding:10px 14px; text-align:left; font-weight:600; font-size:0.8rem; letter-spacing:0.5px; }
-  .stat-table th:last-child { text-align:center; }
-  .stat-table td { padding:10px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
-  .stat-table tr:last-child td { border-bottom:none; }
-  .stat-table tr:nth-child(even) { background:var(--green-pale); }
-  .pct-bar-wrap { display:flex; align-items:center; gap:8px; }
-  .pct-bar { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
-  .pct-fill { height:100%; border-radius:3px; transition:width 0.4s; }
-  .pct-text { font-size:0.82rem; font-weight:600; min-width:36px; text-align:right; }
-  .badge-kat { font-size:0.72rem; color:var(--orange); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+  .spinner-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;padding:40px 0;}
+  .spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--green-light);border-top-color:var(--green);animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .empty-msg{color:var(--ink2);font-size:0.9rem;text-align:center;padding:32px 0;}
+  .status-msg{color:var(--ink2);font-size:0.9rem;text-align:center;padding:32px 0;}
 
-  /* SPINNER */
-  .spinner-wrap { display:flex; flex-direction:column; align-items:center; gap:12px; padding:40px 0; }
-  .spinner { width:32px; height:32px; border-radius:50%; border:3px solid var(--green-light); border-top-color:var(--green); animation:spin 0.8s linear infinite; }
-  @keyframes spin { to { transform:rotate(360deg); } }
-
-  /* STATUS */
-  .status-msg { color:var(--ink2); font-size:0.9rem; text-align:center; padding:32px 0; }
-
-  footer { background:var(--green-dark); text-align:center; padding:12px; font-size:0.72rem; color:rgba(255,255,255,0.45); }
+  footer{background:var(--green-dark);text-align:center;padding:12px;font-size:0.72rem;color:rgba(255,255,255,0.45);}
 </style>
 </head>
 <body>
 
 <header>
-  <span class="header-title" onclick="location.href='index.html'" style="cursor:pointer">Quizr</span>
+  <span class="header-title" onclick="location.href='index.html'">Quizr</span>
   <div class="header-divider"></div>
   <span class="header-sub">Lärarvy</span>
   <div class="header-spacer"></div>
@@ -141,7 +160,6 @@
 </header>
 
 <main id="mainArea">
-  <!-- LOGIN -->
   <div class="login-card" id="loginView">
     <h2>Lärarinloggning</h2>
     <p>Ange lösenordet för att komma åt lärarvyn.</p>
@@ -150,296 +168,349 @@
     <button class="login-btn" onclick="doLogin()">Logga in</button>
   </div>
 
-  <!-- APP (dolt tills inloggad) -->
-  <div id="appView" style="display:none; width:100%; display:none; flex-direction:column; align-items:center;">
-
-    <div class="tabs" id="tabBar">
+  <div id="appView" style="display:none;width:100%;flex-direction:column;align-items:center;">
+    <div class="tabs">
       <button class="tab-btn active" onclick="showTab('begrepp')">Begrepp</button>
+      <button class="tab-btn" onclick="showTab('import')">Importera</button>
       <button class="tab-btn" onclick="showTab('statistik')">Statistik</button>
     </div>
 
-    <!-- BEGREPP-SEKTION -->
+    <!-- BEGREPP -->
     <div class="section active" id="tab-begrepp">
-
       <div class="level-selector" id="begreppLevelSelector"></div>
 
-      <!-- Lägg till begrepp -->
       <div class="card">
         <h3>Lägg till begrepp</h3>
         <div class="form-row">
-          <div>
-            <label>Begrepp</label>
-            <input type="text" id="newBegrepp" placeholder="T.ex. Epik">
-          </div>
-          <div>
-            <label>Kategori</label>
-            <input type="text" id="newKategori" placeholder="T.ex. Litteratur" list="kategoriList">
-            <datalist id="kategoriList"></datalist>
-          </div>
+          <div><label>Begrepp</label><input type="text" id="newBegrepp" placeholder="T.ex. Epik" list="kategoriListB"></div>
+          <div><label>Kategori</label><input type="text" id="newKategori" placeholder="T.ex. Litteratur" list="kategoriList"><datalist id="kategoriList"></datalist></div>
         </div>
-        <div class="form-row single">
-          <div>
-            <label>Förklaring</label>
-            <textarea id="newForklaring" placeholder="Skriv förklaringen här…"></textarea>
-          </div>
-        </div>
+        <div class="form-row single"><div><label>Förklaring</label><textarea id="newForklaring" placeholder="Skriv förklaringen här…"></textarea></div></div>
         <div style="display:flex;align-items:center;margin-top:4px;">
           <button class="btn-primary" onclick="laggTillBegrepp()" id="addBtn">Spara begrepp</button>
           <span class="save-msg" id="saveMsg">✓ Sparat!</span>
         </div>
       </div>
 
-      <!-- Befintliga begrepp -->
       <div class="card">
         <h3>Befintliga begrepp <span id="begreppCount" style="font-weight:400;color:var(--ink2);font-size:0.88rem;"></span></h3>
+        <div class="search-wrap"><input type="text" class="search-input" id="searchInput" placeholder="Sök begrepp…" oninput="renderBegreppList()"></div>
         <div id="begreppList"><div class="spinner-wrap"><div class="spinner"></div></div></div>
       </div>
-
     </div>
 
-    <!-- STATISTIK-SEKTION -->
+    <!-- IMPORTERA -->
+    <div class="section" id="tab-import">
+      <div class="level-selector" id="importLevelSelector"></div>
+
+      <div class="card">
+        <h3>Importera från Excel</h3>
+        <p style="font-size:0.88rem;color:var(--ink2);margin-bottom:16px;line-height:1.5;">
+          Filen ska ha tre kolumner: <strong>Begrepp</strong>, <strong>Förklaring</strong>, <strong>Kategori</strong> — med rubrikrad på rad 1. Befintliga begrepp skrivs inte över.
+        </p>
+
+        <div class="import-zone" id="importZone" onclick="document.getElementById('fileInput').click()"
+          ondragover="event.preventDefault();this.classList.add('drag')"
+          ondragleave="this.classList.remove('drag')"
+          ondrop="handleDrop(event)">
+          <p>Klicka eller dra och släpp din Excel-fil hit</p>
+          <small>.xlsx eller .xls</small>
+        </div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFile(this.files[0])">
+
+        <div class="import-preview" id="importPreview">
+          <p style="font-size:0.88rem;font-weight:600;color:var(--ink);margin-bottom:10px;" id="importInfo"></p>
+          <div style="overflow-x:auto;max-height:320px;overflow-y:auto;border-radius:10px;border:1px solid var(--border);">
+            <table><thead id="importHead"></thead><tbody id="importBody"></tbody></table>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:16px;align-items:center;">
+            <button class="btn-primary" id="importBtn" onclick="doImport()">Importera till Sheets</button>
+            <button class="btn-secondary" onclick="clearImport()">Rensa</button>
+            <span class="save-msg" id="importSaveMsg">✓ Importerat!</span>
+          </div>
+        </div>
+        <div class="import-msg" id="importMsg"></div>
+      </div>
+    </div>
+
+    <!-- STATISTIK -->
     <div class="section" id="tab-statistik">
-
       <div class="level-selector" id="statLevelSelector"></div>
-
       <div id="statContent"><div class="spinner-wrap"><div class="spinner"></div></div></div>
-
     </div>
-
   </div>
 </main>
 
 <footer>Quizr &nbsp;·&nbsp; Göinge utbildningscenter &nbsp;·&nbsp; Skapad av Adam Kedert &nbsp;·&nbsp; Vibekodad med Claude (Anthropic)</footer>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbxTUaieharqemg1X9-5XKTQ0_47UD_u43B6U4gWDnHS4TVjYxbONWXscvwXygMG9Hv4Ng/exec";
-const PASSWORD = "vänligkvartersspindel";
+const API = "https://script.google.com/macros/s/AKfycbxCYp8lS4IXEL-M_ZDrvM3qUHjEOH9UNG3MElyFmCHnBQ1Y5t8vvgeycs8nmYHBnDYdDA/exec";
+const PASSWORD = "v\u00e4nligkvartersspindel";
 
-let isLoggedIn = false;
-let allFragor = [];
-let allStats = {};
-let selectedBegreppNiva = null;
-let selectedStatNiva = null;
+let allFragor=[], allStats={};
+let selectedBegreppNiva=null, selectedStatNiva=null, selectedImportNiva=null;
+let importData=[];
 
 // ---- LOGIN ----
 function doLogin() {
-  const val = document.getElementById("pwInput").value;
-  if (val === PASSWORD) {
-    isLoggedIn = true;
-    document.getElementById("loginView").style.display = "none";
-    document.getElementById("appView").style.display = "flex";
-    document.getElementById("logoutBtn").style.display = "block";
+  if(document.getElementById("pwInput").value === PASSWORD) {
+    document.getElementById("loginView").style.display="none";
+    const av=document.getElementById("appView"); av.style.display="flex";
+    document.getElementById("logoutBtn").style.display="block";
     loadAll();
   } else {
-    document.getElementById("loginError").style.display = "block";
-    document.getElementById("pwInput").value = "";
+    document.getElementById("loginError").style.display="block";
+    document.getElementById("pwInput").value="";
     document.getElementById("pwInput").focus();
   }
 }
-
 function logout() {
-  isLoggedIn = false;
-  document.getElementById("appView").style.display = "none";
-  document.getElementById("loginView").style.display = "block";
-  document.getElementById("logoutBtn").style.display = "none";
-  document.getElementById("pwInput").value = "";
+  document.getElementById("appView").style.display="none";
+  document.getElementById("loginView").style.display="block";
+  document.getElementById("logoutBtn").style.display="none";
+  document.getElementById("pwInput").value="";
 }
 
 // ---- LOAD ----
 async function loadAll() {
   try {
-    const [fRes, sRes] = await Promise.all([
-      fetch(API + "?action=getFragor"),
-      fetch(API + "?action=getStatistik")
-    ]);
-    const fData = await fRes.json();
-    const sData = await sRes.json();
-    allFragor = fData.fragor || [];
-    allStats  = sData.statistik || {};
-
-    const nivaer = [...new Set(allFragor.map(f => f.niva).filter(Boolean))].sort();
+    const [fRes,sRes]=await Promise.all([fetch(API+"?action=getFragor"),fetch(API+"?action=getStatistik")]);
+    const fData=await fRes.json(); const sData=await sRes.json();
+    allFragor=fData.fragor||[]; allStats=sData.statistik||{};
+    const nivaer=[...new Set(allFragor.map(f=>f.niva).filter(Boolean))].sort();
     buildLevelSelectors(nivaer);
-    if (nivaer.length > 0) {
-      selectBegreppNiva(nivaer[0]);
-      selectStatNiva(nivaer[0]);
-    }
-  } catch(e) {
-    document.getElementById("begreppList").innerHTML = '<div class="status-msg">Kunde inte hämta data. Kontrollera anslutningen.</div>';
-  }
+    if(nivaer.length>0){selectBegreppNiva(nivaer[0]);selectStatNiva(nivaer[0]);selectImportNiva(nivaer[0]);}
+  } catch(e){document.getElementById("begreppList").innerHTML='<div class="status-msg">Kunde inte hämta data.</div>';}
 }
 
 function buildLevelSelectors(nivaer) {
-  ["begreppLevelSelector","statLevelSelector"].forEach(id => {
-    document.getElementById(id).innerHTML = nivaer.map(n =>
-      `<button class="level-btn" data-niva="${n}" onclick="${id==='begreppLevelSelector'?'selectBegreppNiva':'selectStatNiva'}('${n}')">${n}</button>`
-    ).join("");
+  [["begreppLevelSelector","selectBegreppNiva"],["statLevelSelector","selectStatNiva"],["importLevelSelector","selectImportNiva"]].forEach(([id,fn])=>{
+    document.getElementById(id).innerHTML=nivaer.map(n=>
+      `<button class="level-btn" data-niva="${n}" onclick="${fn}('${n}')">${n}</button>`).join("");
   });
 }
 
 // ---- TABS ----
 function showTab(tab) {
-  document.querySelectorAll(".tab-btn").forEach((b,i) => b.classList.toggle("active", (i===0&&tab==="begrepp")||(i===1&&tab==="statistik")));
-  document.getElementById("tab-begrepp").classList.toggle("active", tab==="begrepp");
-  document.getElementById("tab-statistik").classList.toggle("active", tab==="statistik");
+  ["begrepp","import","statistik"].forEach((t,i)=>{
+    document.querySelectorAll(".tab-btn")[i].classList.toggle("active",t===tab);
+    document.getElementById("tab-"+t).classList.toggle("active",t===tab);
+  });
 }
 
 // ---- BEGREPP ----
 function selectBegreppNiva(niva) {
-  selectedBegreppNiva = niva;
-  document.querySelectorAll("#begreppLevelSelector .level-btn").forEach(b =>
-    b.classList.toggle("active", b.dataset.niva === niva));
-  renderBegreppList();
-  updateKategoriList();
+  selectedBegreppNiva=niva;
+  document.querySelectorAll("#begreppLevelSelector .level-btn").forEach(b=>b.classList.toggle("active",b.dataset.niva===niva));
+  renderBegreppList(); updateKategoriList();
 }
 
 function renderBegreppList() {
-  const fragor = allFragor.filter(f => f.niva === selectedBegreppNiva);
-  document.getElementById("begreppCount").textContent = `(${fragor.length} begrepp)`;
-  if (fragor.length === 0) {
-    document.getElementById("begreppList").innerHTML = '<div class="empty-msg">Inga begrepp ännu på den här nivån.</div>';
-    return;
-  }
-  const sorted = [...fragor].sort((a,b) => a.begrepp.localeCompare(b.begrepp, "sv"));
-  document.getElementById("begreppList").innerHTML = `
-    <div class="begrepp-list">
-      ${sorted.map((f,i) => `
-        <div class="begrepp-item" id="bi-${i}">
-          <div class="begrepp-text">
-            <div class="begrepp-name">${f.begrepp}</div>
-            <div class="begrepp-forklaring">${f.forklaring}</div>
-            ${f.kategori ? `<div class="begrepp-kat">${f.kategori}</div>` : ""}
-          </div>
-          <button class="btn-danger" onclick="taBortBegrepp('${f.begrepp.replace(/'/g,"\\'")}')">Ta bort</button>
+  const q=(document.getElementById("searchInput").value||"").toLowerCase();
+  let fragor=allFragor.filter(f=>f.niva===selectedBegreppNiva);
+  if(q) fragor=fragor.filter(f=>f.begrepp.toLowerCase().includes(q)||f.forklaring.toLowerCase().includes(q));
+  fragor.sort((a,b)=>a.begrepp.localeCompare(b.begrepp,"sv"));
+  document.getElementById("begreppCount").textContent=`(${allFragor.filter(f=>f.niva===selectedBegreppNiva).length} begrepp)`;
+  if(fragor.length===0){document.getElementById("begreppList").innerHTML='<div class="empty-msg">Inga begrepp hittades.</div>';return;}
+  document.getElementById("begreppList").innerHTML=`<div class="begrepp-list">${fragor.map(f=>`
+    <div class="begrepp-item" id="item-${esc(f.begrepp)}">
+      <div class="begrepp-row">
+        <div class="begrepp-text">
+          <div class="begrepp-name">${f.begrepp}</div>
+          <div class="begrepp-forklaring">${f.forklaring}</div>
+          ${f.kategori?`<div class="begrepp-kat">${f.kategori}</div>`:""}
         </div>
-      `).join("")}
-    </div>`;
+        <div class="begrepp-actions">
+          <button class="btn-edit" onclick="toggleEdit('${esc(f.begrepp)}','${esc(f.forklaring)}','${esc(f.kategori||"")}')">Redigera</button>
+          <button class="btn-danger" onclick="taBortBegrepp('${esc(f.begrepp)}')">Ta bort</button>
+        </div>
+      </div>
+      <div class="edit-form" id="edit-${esc(f.begrepp)}">
+        <div class="edit-row">
+          <div><span class="edit-label">Begrepp</span><input type="text" class="edit-input" id="eb-${esc(f.begrepp)}" value="${f.begrepp}"></div>
+          <div><span class="edit-label">Kategori</span><input type="text" class="edit-input" id="ek-${esc(f.begrepp)}" value="${f.kategori||""}" list="kategoriList"></div>
+        </div>
+        <div class="edit-row single"><div><span class="edit-label">Förklaring</span><textarea class="edit-input edit-textarea" id="ef-${esc(f.begrepp)}">${f.forklaring}</textarea></div></div>
+        <div class="edit-btns">
+          <button class="btn-primary" style="padding:9px 20px;font-size:0.88rem;" onclick="sparaEdit('${esc(f.begrepp)}')">Spara</button>
+          <button class="btn-secondary" style="padding:9px 20px;font-size:0.88rem;" onclick="toggleEdit('${esc(f.begrepp)}')">Avbryt</button>
+        </div>
+      </div>
+    </div>`).join("")}</div>`;
 }
 
-function updateKategoriList() {
-  const kats = [...new Set(allFragor.filter(f=>f.niva===selectedBegreppNiva).map(f=>f.kategori).filter(Boolean))];
-  document.getElementById("kategoriList").innerHTML = kats.map(k=>`<option value="${k}">`).join("");
+function esc(s){return String(s).replace(/'/g,"\\'").replace(/"/g,"&quot;");}
+
+function toggleEdit(begrepp) {
+  const el=document.getElementById("edit-"+esc(begrepp));
+  if(!el)return;
+  el.classList.toggle("open");
+  if(el.classList.contains("open")) document.getElementById("eb-"+esc(begrepp)).focus();
 }
 
-async function laggTillBegrepp() {
-  const begrepp   = document.getElementById("newBegrepp").value.trim();
-  const forklaring= document.getElementById("newForklaring").value.trim();
-  const kategori  = document.getElementById("newKategori").value.trim();
-  if (!begrepp || !forklaring) { alert("Fyll i begrepp och förklaring."); return; }
-  if (!selectedBegreppNiva) { alert("Välj en nivå."); return; }
-
-  const btn = document.getElementById("addBtn");
-  btn.disabled = true;
+async function sparaEdit(gammaltBegrepp) {
+  const nyttBegrepp  =document.getElementById("eb-"+esc(gammaltBegrepp)).value.trim();
+  const nyttForklaring=document.getElementById("ef-"+esc(gammaltBegrepp)).value.trim();
+  const nyttKategori =document.getElementById("ek-"+esc(gammaltBegrepp)).value.trim();
+  if(!nyttBegrepp||!nyttForklaring){alert("Begrepp och förklaring får inte vara tomma.");return;}
   try {
-    const res = await fetch(API, {
-      method: "POST",
-      body: JSON.stringify({ action: "addBegrepp", begrepp, forklaring, kategori, niva: selectedBegreppNiva }),
-      headers: { "Content-Type": "text/plain" }
-    });
-    const data = await res.json();
-    if (data.ok) {
-      allFragor.push({ begrepp, forklaring, kategori, niva: selectedBegreppNiva });
-      document.getElementById("newBegrepp").value = "";
-      document.getElementById("newForklaring").value = "";
-      document.getElementById("newKategori").value = "";
-      renderBegreppList();
-      updateKategoriList();
-      const msg = document.getElementById("saveMsg");
-      msg.classList.add("show");
-      setTimeout(()=>msg.classList.remove("show"), 2500);
+    const res=await fetch(API,{method:"POST",body:JSON.stringify({action:"editBegrepp",gammaltBegrepp,nyttBegrepp,nyttForklaring,nyttKategori,niva:selectedBegreppNiva}),headers:{"Content-Type":"text/plain"}});
+    const data=await res.json();
+    if(data.ok){
+      const idx=allFragor.findIndex(f=>f.begrepp===gammaltBegrepp&&f.niva===selectedBegreppNiva);
+      if(idx>-1) allFragor[idx]={begrepp:nyttBegrepp,forklaring:nyttForklaring,kategori:nyttKategori,niva:selectedBegreppNiva};
+      renderBegreppList(); updateKategoriList();
     }
-  } catch(e) { alert("Något gick fel. Försök igen."); }
-  btn.disabled = false;
+  } catch(e){alert("Kunde inte spara. Försök igen.");}
 }
 
-async function taBortBegrepp(begrepp) {
-  if (!confirm(`Ta bort "${begrepp}" från ${selectedBegreppNiva}?`)) return;
+function updateKategoriList(){
+  const kats=[...new Set(allFragor.filter(f=>f.niva===selectedBegreppNiva).map(f=>f.kategori).filter(Boolean))];
+  document.getElementById("kategoriList").innerHTML=kats.map(k=>`<option value="${k}">`).join("");
+}
+
+async function laggTillBegrepp(){
+  const begrepp=document.getElementById("newBegrepp").value.trim();
+  const forklaring=document.getElementById("newForklaring").value.trim();
+  const kategori=document.getElementById("newKategori").value.trim();
+  if(!begrepp||!forklaring){alert("Fyll i begrepp och förklaring.");return;}
+  if(!selectedBegreppNiva){alert("Välj en nivå.");return;}
+  const btn=document.getElementById("addBtn"); btn.disabled=true;
   try {
-    const res = await fetch(API, {
-      method: "POST",
-      body: JSON.stringify({ action: "deleteBegrepp", begrepp, niva: selectedBegreppNiva }),
-      headers: { "Content-Type": "text/plain" }
-    });
-    const data = await res.json();
-    if (data.ok) {
-      allFragor = allFragor.filter(f => !(f.begrepp===begrepp && f.niva===selectedBegreppNiva));
-      renderBegreppList();
+    const res=await fetch(API,{method:"POST",body:JSON.stringify({action:"addBegrepp",begrepp,forklaring,kategori,niva:selectedBegreppNiva}),headers:{"Content-Type":"text/plain"}});
+    const data=await res.json();
+    if(data.ok){
+      allFragor.push({begrepp,forklaring,kategori,niva:selectedBegreppNiva});
+      document.getElementById("newBegrepp").value="";
+      document.getElementById("newForklaring").value="";
+      document.getElementById("newKategori").value="";
+      renderBegreppList(); updateKategoriList();
+      const msg=document.getElementById("saveMsg"); msg.classList.add("show");
+      setTimeout(()=>msg.classList.remove("show"),2500);
     }
-  } catch(e) { alert("Kunde inte ta bort. Försök igen."); }
+  } catch(e){alert("Något gick fel.");}
+  btn.disabled=false;
+}
+
+async function taBortBegrepp(begrepp){
+  if(!confirm(`Ta bort "${begrepp}" från ${selectedBegreppNiva}?`))return;
+  try {
+    const res=await fetch(API,{method:"POST",body:JSON.stringify({action:"deleteBegrepp",begrepp,niva:selectedBegreppNiva}),headers:{"Content-Type":"text/plain"}});
+    const data=await res.json();
+    if(data.ok){allFragor=allFragor.filter(f=>!(f.begrepp===begrepp&&f.niva===selectedBegreppNiva));renderBegreppList();}
+  } catch(e){alert("Kunde inte ta bort.");}
+}
+
+// ---- IMPORT ----
+function selectImportNiva(niva){
+  selectedImportNiva=niva;
+  document.querySelectorAll("#importLevelSelector .level-btn").forEach(b=>b.classList.toggle("active",b.dataset.niva===niva));
+}
+
+function handleDrop(e){
+  e.preventDefault(); document.getElementById("importZone").classList.remove("drag");
+  const file=e.dataTransfer.files[0]; if(file) handleFile(file);
+}
+
+function handleFile(file){
+  if(!file){return;}
+  const msg=document.getElementById("importMsg"); msg.textContent=""; msg.className="import-msg";
+  if(!file.name.match(/\.(xlsx|xls)$/i)){msg.textContent="Bara .xlsx och .xls stöds.";msg.className="import-msg err";return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try {
+      const wb=XLSX.read(e.target.result,{type:"binary"});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:""});
+      if(rows.length<2){msg.textContent="Filen verkar vara tom.";msg.className="import-msg err";return;}
+      // Skip header row
+      importData=rows.slice(1).filter(r=>String(r[0]).trim()&&String(r[1]).trim()).map(r=>({
+        begrepp:String(r[0]).trim(), forklaring:String(r[1]).trim(), kategori:String(r[2]||"").trim()
+      }));
+      if(importData.length===0){msg.textContent="Hittade inga kompletta rader (begrepp + förklaring krävs).";msg.className="import-msg err";return;}
+      showImportPreview();
+    } catch(err){msg.textContent="Kunde inte läsa filen.";msg.className="import-msg err";}
+  };
+  reader.readAsBinaryString(file);
+}
+
+function showImportPreview(){
+  document.getElementById("importInfo").textContent=`${importData.length} begrepp redo att importeras till ${selectedImportNiva}`;
+  document.getElementById("importHead").innerHTML="<tr><th>Begrepp</th><th>Förklaring</th><th>Kategori</th></tr>";
+  document.getElementById("importBody").innerHTML=importData.slice(0,20).map(r=>`<tr><td>${r.begrepp}</td><td>${r.forklaring}</td><td>${r.kategori||"–"}</td></tr>`).join("")
+    +(importData.length>20?`<tr><td colspan="3" style="color:var(--ink2);font-style:italic;">… och ${importData.length-20} till</td></tr>`:"");
+  document.getElementById("importPreview").style.display="block";
+}
+
+async function doImport(){
+  if(!importData.length||!selectedImportNiva)return;
+  const btn=document.getElementById("importBtn"); btn.disabled=true; btn.textContent="Importerar…";
+  try {
+    const res=await fetch(API,{method:"POST",body:JSON.stringify({action:"importBegrepp",begrepp:importData,niva:selectedImportNiva}),headers:{"Content-Type":"text/plain"}});
+    const data=await res.json();
+    if(data.ok){
+      importData.forEach(r=>allFragor.push({...r,niva:selectedImportNiva}));
+      const msg=document.getElementById("importSaveMsg"); msg.classList.add("show");
+      setTimeout(()=>msg.classList.remove("show"),3000);
+      clearImport();
+      if(selectedBegreppNiva===selectedImportNiva) renderBegreppList();
+    }
+  } catch(e){alert("Import misslyckades.");}
+  btn.disabled=false; btn.textContent="Importera till Sheets";
+}
+
+function clearImport(){
+  importData=[];
+  document.getElementById("importPreview").style.display="none";
+  document.getElementById("importMsg").textContent="";
+  document.getElementById("fileInput").value="";
 }
 
 // ---- STATISTIK ----
-function selectStatNiva(niva) {
-  selectedStatNiva = niva;
-  document.querySelectorAll("#statLevelSelector .level-btn").forEach(b =>
-    b.classList.toggle("active", b.dataset.niva === niva));
+function selectStatNiva(niva){
+  selectedStatNiva=niva;
+  document.querySelectorAll("#statLevelSelector .level-btn").forEach(b=>b.classList.toggle("active",b.dataset.niva===niva));
   renderStatistik();
 }
 
-function renderStatistik() {
-  const stats = allStats[selectedStatNiva] || [];
-  const container = document.getElementById("statContent");
-  if (stats.length === 0) {
-    container.innerHTML = '<div class="status-msg">Ingen statistik ännu för den här nivån.</div>';
-    return;
-  }
+function renderStatistik(){
+  const stats=allStats[selectedStatNiva]||[];
+  const container=document.getElementById("statContent");
+  if(stats.length===0){container.innerHTML='<div class="status-msg">Ingen statistik ännu för den här nivån.</div>';return;}
+  const totaltSvar=stats.reduce((s,r)=>s+(r.totalt||0),0);
+  const med=stats.filter(r=>r.pctRatt!==null);
+  const snittPct=med.length>0?Math.round(med.reduce((s,r)=>s+r.pctRatt,0)/med.length):0;
+  const svara=stats.filter(r=>r.pctRatt!==null&&r.pctRatt<60&&r.totalt>=5).length;
+  const tranade=stats.filter(r=>r.totalt>0).length;
+  const sorted=[...stats].sort((a,b)=>(a.pctRatt??100)-(b.pctRatt??100));
 
-  const totaltSvar   = stats.reduce((s,r) => s + (r.totalt||0), 0);
-  const snittPct     = stats.filter(r=>r.pctRatt!==null).length > 0
-    ? Math.round(stats.filter(r=>r.pctRatt!==null).reduce((s,r)=>s+(r.pctRatt||0),0) / stats.filter(r=>r.pctRatt!==null).length)
-    : 0;
-  const svara        = stats.filter(r=>r.pctRatt!==null&&r.pctRatt<60&&r.totalt>=5).length;
-  const tranade      = stats.filter(r=>r.totalt>0).length;
-
-  const sorted = [...stats].sort((a,b) => (a.pctRatt??100)-(b.pctRatt??100));
-
-  container.innerHTML = `
+  container.innerHTML=`
     <div class="stat-grid">
-      <div class="stat-card">
-        <div class="stat-number">${totaltSvar}</div>
-        <div class="stat-label">Totalt antal svar</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number">${snittPct}%</div>
-        <div class="stat-label">Snitt % rätt</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number">${tranade}</div>
-        <div class="stat-label">Tränade begrepp</div>
-      </div>
-      <div class="stat-card" style="border-color:#f5c0b0; background:var(--orange-pale);">
+      <div class="stat-card"><div class="stat-number">${totaltSvar}</div><div class="stat-label">Totalt antal svar</div></div>
+      <div class="stat-card"><div class="stat-number">${snittPct}%</div><div class="stat-label">Snitt % rätt</div></div>
+      <div class="stat-card"><div class="stat-number">${tranade}</div><div class="stat-label">Tränade begrepp</div></div>
+      <div class="stat-card" style="border-color:#f5c0b0;background:var(--orange-pale);">
         <div class="stat-number" style="color:var(--orange);">${svara}</div>
         <div class="stat-label">Svåra begrepp (&lt;60%)</div>
       </div>
     </div>
-
     <div class="card" style="overflow-x:auto;">
       <h3>Alla begrepp — sorterat efter svårighet</h3>
       <table class="stat-table" style="margin-top:16px;">
-        <thead>
-          <tr>
-            <th>Begrepp</th>
-            <th>Kategori</th>
-            <th style="text-align:center">Svar</th>
-            <th>% Rätt</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${sorted.map(r => {
-            const pct = r.pctRatt ?? 0;
-            const color = pct >= 75 ? "#568E14" : pct >= 50 ? "#f5a623" : "#DD5900";
-            return `<tr>
-              <td style="font-weight:600">${r.begrepp}</td>
-              <td><span class="badge-kat">${r.kategori||"–"}</span></td>
-              <td style="text-align:center;color:var(--ink2)">${r.totalt}</td>
-              <td>
-                <div class="pct-bar-wrap">
-                  <div class="pct-bar"><div class="pct-fill" style="width:${pct}%;background:${color}"></div></div>
-                  <span class="pct-text" style="color:${color}">${r.pctRatt!==null?pct+"%":"–"}</span>
-                </div>
-              </td>
-            </tr>`;
-          }).join("")}
-        </tbody>
+        <thead><tr><th>Begrepp</th><th>Kategori</th><th style="text-align:center">Svar</th><th>% Rätt</th></tr></thead>
+        <tbody>${sorted.map(r=>{
+          const pct=r.pctRatt??0;
+          const color=pct>=75?"#568E14":pct>=50?"#f5a623":"#DD5900";
+          return `<tr>
+            <td style="font-weight:600">${r.begrepp}</td>
+            <td><span class="badge-kat">${r.kategori||"–"}</span></td>
+            <td style="text-align:center;color:var(--ink2)">${r.totalt}</td>
+            <td><div class="pct-bar-wrap">
+              <div class="pct-bar"><div class="pct-fill" style="width:${pct}%;background:${color}"></div></div>
+              <span class="pct-text" style="color:${color}">${r.pctRatt!==null?pct+"%":"–"}</span>
+            </div></td>
+          </tr>`;
+        }).join("")}</tbody>
       </table>
     </div>`;
 }
