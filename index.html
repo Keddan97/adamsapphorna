@@ -608,10 +608,10 @@ let secretTimer = null;
 function secretClick() {
   secretClicks++;
   clearTimeout(secretTimer);
-  secretTimer = setTimeout(() => { secretClicks = 0; }, 1200);
-  if (secretClicks >= 4) {
+  secretTimer = setTimeout(() => { secretClicks = 0; }, 800);
+  if (secretClicks >= 3) {
     secretClicks = 0;
-    showSecretLogin();
+    window.open("larare.html", "_blank");
   }
 }
 
