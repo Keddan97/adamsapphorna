@@ -24,321 +24,90 @@
       --n2:           #65337c;
       --n3:           #2c9aa6;
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Source Sans 3", sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
 
-    body {
-      font-family: "Source Sans 3", sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    header {
-      background: var(--green);
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      height: 64px;
-      flex-shrink: 0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
+    header { background: var(--green); padding: 0 24px; display: flex; align-items: center; gap: 14px; height: 64px; flex-shrink: 0; position: sticky; top: 0; z-index: 100; }
     .header-left { display: flex; align-items: center; gap: 14px; flex: 1; }
-
-    .header-title {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 2.2rem;
-      color: #fff;
-      letter-spacing: 2px;
-      line-height: 1;
-      margin-top: 2px;
-    }
-
+    .header-title { font-family: "Bebas Neue", sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; line-height: 1; margin-top: 2px; }
     .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
     .logo-img { height: 34px; width: auto; }
-
-    @media (max-width: 480px) {
-      .logo-img { display: none; }
-      .header-divider { display: none; }
-      .header-title { font-size: 2rem; }
-    }
-
-    .fullscreen-btn {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.8);
-      font-size: 1.3rem;
-      cursor: pointer;
-      padding: 6px;
-      border-radius: 6px;
-      transition: background 0.15s;
-    }
+    @media (max-width: 480px) { .logo-img { display: none; } .header-divider { display: none; } .header-title { font-size: 2rem; } }
+    .fullscreen-btn { background: none; border: none; color: rgba(255,255,255,0.8); font-size: 1.3rem; cursor: pointer; padding: 6px; border-radius: 6px; transition: background 0.15s; }
     .fullscreen-btn:hover { background: rgba(255,255,255,0.15); }
 
-    .hero {
-      background: var(--green);
-      padding: 36px 24px 48px;
-      text-align: center;
-      color: #fff;
-      border-top: 1px solid rgba(255,255,255,0.15);
-    }
+    .hero { background: var(--green); padding: 36px 24px 48px; text-align: center; color: #fff; border-top: 1px solid rgba(255,255,255,0.15); }
+    .hero h1 { font-family: "Bebas Neue", sans-serif; font-size: clamp(2.6rem, 8vw, 4.4rem); letter-spacing: 0.06em; line-height: 1; margin-bottom: 10px; }
+    .hero p { font-size: 1.05rem; color: rgba(255,255,255,0.85); max-width: 460px; margin: 0 auto; line-height: 1.5; }
 
-    .hero h1 {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(2.6rem, 8vw, 4.4rem);
-      letter-spacing: 0.06em;
-      line-height: 1;
-      margin-bottom: 10px;
-    }
+    main { flex: 1; max-width: 900px; margin: 0 auto; width: 100%; padding: 40px 20px 60px; }
 
-    .hero p {
-      font-size: 1.05rem;
-      color: rgba(255,255,255,0.85);
-      max-width: 460px;
-      margin: 0 auto;
-      line-height: 1.5;
-    }
+    .filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-label { font-family: "Bebas Neue", sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; color: var(--ink2); text-transform: uppercase; padding-bottom: 2px; border-bottom: 2px solid var(--border); margin-right: 4px; }
+    .filter-btn { background: var(--card); border: 2px solid var(--border); border-radius: 50px; padding: 6px 16px; font-family: "Source Sans 3", sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--ink2); cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+    .filter-btn[data-filter="alla"]:hover,  .filter-btn[data-filter="alla"].active  { background: var(--green); border-color: var(--green); color: #fff; }
+    .filter-btn[data-filter="niva1"]:hover, .filter-btn[data-filter="niva1"].active { background: var(--n1); border-color: var(--n1); color: #fff; }
+    .filter-btn[data-filter="niva2"]:hover, .filter-btn[data-filter="niva2"].active { background: var(--n2); border-color: var(--n2); color: #fff; }
+    .filter-btn[data-filter="niva3"]:hover, .filter-btn[data-filter="niva3"].active { background: var(--n3); border-color: var(--n3); color: #fff; }
 
-    main {
-      flex: 1;
-      max-width: 900px;
-      margin: 0 auto;
-      width: 100%;
-      padding: 40px 20px 60px;
-    }
+    .section-label { font-family: "Bebas Neue", sans-serif; font-size: 1.1rem; letter-spacing: 0.12em; color: var(--ink2); text-transform: uppercase; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+    .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; margin-bottom: 48px; }
 
-    .filter-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .filter-label {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.12em;
-      color: var(--ink2);
-      text-transform: uppercase;
-      padding-bottom: 2px;
-      border-bottom: 2px solid var(--border);
-      margin-right: 4px;
-    }
-
-    .filter-btn {
-      background: var(--card);
-      border: 2px solid var(--border);
-      border-radius: 50px;
-      padding: 6px 16px;
-      font-family: "Source Sans 3", sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--ink2);
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
-    }
-
-    .filter-btn[data-filter="alla"]:hover,
-    .filter-btn[data-filter="alla"].active   { background: var(--green); border-color: var(--green); color: #fff; }
-    .filter-btn[data-filter="niva1"]:hover,
-    .filter-btn[data-filter="niva1"].active  { background: var(--n1); border-color: var(--n1); color: #fff; }
-    .filter-btn[data-filter="niva2"]:hover,
-    .filter-btn[data-filter="niva2"].active  { background: var(--n2); border-color: var(--n2); color: #fff; }
-    .filter-btn[data-filter="niva3"]:hover,
-    .filter-btn[data-filter="niva3"].active  { background: var(--n3); border-color: var(--n3); color: #fff; }
-
-    .section-label {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.12em;
-      color: var(--ink2);
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--border);
-    }
-
-    .app-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 20px;
-      margin-bottom: 48px;
-    }
-
-    /* ── KORT – tjock helborder i nivåfärg ── */
-    .app-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 0 0 20px 0;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.15s, border-color 0.15s;
-      overflow: hidden;
-    }
-
+    .app-card { background: var(--card); border-radius: var(--radius); padding: 0 0 20px 0; display: flex; flex-direction: column; transition: transform 0.15s, border-color 0.15s; overflow: hidden; }
     .app-card:hover { transform: translateY(-2px); }
-    .app-card.coming-soon { opacity: 0.72; }
     .app-card.hidden { display: none; }
-
-    /* Tjock helborder per nivå */
-    .app-card[data-levels="niva1"]             { border: 3px solid var(--n1); }
-    .app-card[data-levels="niva2"]             { border: 3px solid var(--n2); }
-    .app-card[data-levels="niva3"]             { border: 3px solid var(--n3); }
-    .app-card[data-levels="niva1 niva2 niva3"] { border: 3px solid var(--green); }
-    .app-card[data-levels="ovrigt"]            { border: 3px solid var(--orange); }
-
-    /* Hover – lite mörkare */
-    .app-card[data-levels="niva1"]:hover             { border-color: #a82d38; }
-    .app-card[data-levels="niva2"]:hover             { border-color: #4a2560; }
-    .app-card[data-levels="niva3"]:hover             { border-color: #1f7a85; }
-    .app-card[data-levels="niva1 niva2 niva3"]:hover { border-color: var(--green-dark); }
-    .app-card[data-levels="ovrigt"]:hover            { border-color: #b84a00; }
-
-    .app-card-body {
-      padding: 20px 22px 0 22px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .app-card-top {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      margin-bottom: 12px;
-    }
-
-    .app-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.7rem;
-      flex-shrink: 0;
-    }
-
-    .app-card[data-levels="niva1"] .app-icon             { background: #fce8ea; }
-    .app-card[data-levels="niva2"] .app-icon             { background: #ede0f5; }
-    .app-card[data-levels="niva3"] .app-icon             { background: #d6f0f4; }
-    .app-card[data-levels="niva1 niva2 niva3"] .app-icon { background: var(--green-pale); }
-    .app-card[data-levels="ovrigt"] .app-icon            { background: var(--orange-pale); }
-    .app-card[data-levels="niva1"] .app-icon.rymdinvaders { background: #1A2410; }
-
+    .app-card-body { padding: 20px 22px 0 22px; display: flex; flex-direction: column; flex: 1; }
+    .app-card-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+    .app-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.7rem; flex-shrink: 0; }
     .app-meta { flex: 1; min-width: 0; }
+    .app-name { font-family: "Bebas Neue", sans-serif; font-size: 1.4rem; letter-spacing: 0.04em; color: var(--ink); line-height: 1.1; margin-bottom: 2px; }
+    .app-badge { display: inline-block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 8px; border-radius: 50px; line-height: 1.6; }
+    .app-desc { font-size: 0.92rem; color: var(--ink2); line-height: 1.5; flex: 1; margin-bottom: 18px; }
+    .app-actions { padding: 0 22px; display: flex; gap: 8px; align-items: center; }
+    .btn-open { border: none; border-radius: 50px; padding: 9px 22px; font-family: "Source Sans 3", sans-serif; font-size: 0.93rem; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: filter 0.15s, transform 0.1s; color: #fff; }
+    .btn-open:hover { filter: brightness(0.88); transform: scale(1.02); }
 
-    .app-name {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 1.4rem;
-      letter-spacing: 0.04em;
-      color: var(--ink);
-      line-height: 1.1;
-      margin-bottom: 2px;
-    }
+    /* Laddningsindikator */
+    .loading-msg { text-align: center; color: var(--ink2); font-size: 0.95rem; padding: 32px 0; }
 
-    .app-badge {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 50px;
-      line-height: 1.6;
-    }
-
-    .badge-niva1  { background: #fce8ea; color: var(--n1); }
-    .badge-niva2  { background: #ede0f5; color: var(--n2); }
-    .badge-niva3  { background: #d6f0f4; color: var(--n3); }
-    .badge-alla   { background: var(--green-light); color: var(--green-dark); }
-    .badge-ovrigt { background: var(--orange-pale); color: var(--orange); }
-    .badge-coming { background: #eee; color: #888; }
-
-    .app-desc {
-      font-size: 0.92rem;
-      color: var(--ink2);
-      line-height: 1.5;
-      flex: 1;
-      margin-bottom: 18px;
-    }
-
-    .app-actions { padding: 0 22px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-
-    .btn-primary {
-      border: none;
-      border-radius: 50px;
-      padding: 9px 22px;
-      font-family: "Source Sans 3", sans-serif;
-      font-size: 0.93rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: filter 0.15s, transform 0.1s;
-      color: #fff;
-    }
-    .btn-primary:hover { filter: brightness(0.88); transform: scale(1.02); }
-
-    /* Knappfärger – alla nivåer = grön, nivåspecifika = nivåfärg, övrigt = orange */
-    .app-card[data-levels="niva1"] .btn-primary             { background: var(--n1); }
-    .app-card[data-levels="niva2"] .btn-primary             { background: var(--n2); }
-    .app-card[data-levels="niva3"] .btn-primary             { background: var(--n3); }
-    .app-card[data-levels="niva1 niva2 niva3"] .btn-primary { background: var(--green); }
-    .app-card[data-levels="ovrigt"] .btn-primary            { background: var(--orange); }
-
-    .btn-disabled {
-      background: #e0e0e0;
-      color: #aaa;
-      border: none;
-      border-radius: 50px;
-      padding: 9px 22px;
-      font-family: "Source Sans 3", sans-serif;
-      font-size: 0.93rem;
-      font-weight: 700;
-      cursor: not-allowed;
-      display: inline-block;
-    }
-
-    .about-strip {
-      background: var(--green-pale);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px 24px;
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-    }
-
+    .about-strip { background: var(--green-pale); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 22px 24px; display: flex; gap: 16px; align-items: flex-start; }
     .about-strip-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
-
-    .about-strip h2 {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: 1.25rem;
-      letter-spacing: 0.05em;
-      color: var(--green-dark);
-      margin-bottom: 4px;
-    }
-
+    .about-strip h2 { font-family: "Bebas Neue", sans-serif; font-size: 1.25rem; letter-spacing: 0.05em; color: var(--green-dark); margin-bottom: 4px; }
     .about-strip p { font-size: 0.92rem; color: var(--ink2); line-height: 1.55; }
 
-    footer {
-      background: var(--green-dark);
-      color: rgba(255,255,255,0.7);
-      font-size: 0.78rem;
-      text-align: center;
-      padding: 14px 16px;
-      line-height: 1.7;
-    }
+    footer { background: var(--green-dark); color: rgba(255,255,255,0.7); font-size: 0.78rem; text-align: center; padding: 14px 16px; line-height: 1.7; }
+    #footer-trigger { cursor: default; user-select: none; color: rgba(255,255,255,0.45); }
+
+    /* ══ ADMIN-PANEL ══ */
+    .admin-overlay { display: none; position: fixed; inset: 0; background: rgba(10,20,5,0.55); z-index: 200; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto; }
+    .admin-overlay.open { display: flex; }
+    .admin-panel { background: var(--card); border-radius: 18px; width: 100%; max-width: 640px; box-shadow: 0 8px 40px rgba(0,0,0,0.18); overflow: hidden; margin: auto; }
+    .admin-header { background: var(--green-dark); color: #fff; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .admin-header h2 { font-family: "Bebas Neue", sans-serif; font-size: 1.6rem; letter-spacing: 0.06em; }
+    .admin-close { background: none; border: none; color: rgba(255,255,255,0.8); font-size: 1.4rem; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+    .admin-close:hover { background: rgba(255,255,255,0.15); }
+    .admin-body { padding: 24px; }
+    .admin-divider { font-family: "Bebas Neue", sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: var(--ink2); margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
+    .admin-app-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .admin-app-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+    .admin-app-row .row-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .admin-app-row .row-info { flex: 1; min-width: 0; }
+    .admin-app-row .row-name { font-family: "Bebas Neue", sans-serif; font-size: 1.1rem; letter-spacing: 0.04em; color: var(--ink); }
+    .admin-app-row .row-meta { font-size: 0.78rem; color: var(--ink2); }
+    .admin-app-row .row-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .btn-delete { background: none; border: 1.5px solid #e0b0b4; border-radius: 6px; color: var(--n1); font-size: 0.8rem; font-weight: 700; cursor: pointer; padding: 4px 10px; transition: background 0.15s; flex-shrink: 0; }
+    .btn-delete:hover { background: #fce8ea; }
+    .admin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 500px) { .admin-form { grid-template-columns: 1fr; } }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.8rem; font-weight: 700; color: var(--ink2); letter-spacing: 0.04em; text-transform: uppercase; }
+    .form-group input, .form-group select { background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 12px; font-family: "Source Sans 3", sans-serif; font-size: 0.92rem; color: var(--ink); outline: none; transition: border-color 0.15s; }
+    .form-group input:focus, .form-group select:focus { border-color: var(--green); }
+    .btn-add { grid-column: 1 / -1; background: var(--green); color: #fff; border: none; border-radius: 50px; padding: 11px 24px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.15s; margin-top: 4px; }
+    .btn-add:hover { background: var(--green-dark); }
+    .btn-add:disabled { background: #ccc; cursor: not-allowed; }
+    .admin-toast { display: none; border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; font-weight: 600; margin-top: 14px; grid-column: 1 / -1; }
   </style>
 </head>
 <body>
@@ -358,7 +127,6 @@
   </div>
 
   <main>
-
     <div class="filter-bar">
       <span class="filter-label">Visa</span>
       <button class="filter-btn active" data-filter="alla">Alla appar</button>
@@ -369,77 +137,11 @@
 
     <p class="section-label">Lärappar</p>
     <div class="app-grid" id="grid-larappar">
-
-      <div class="app-card" data-levels="niva1 niva2 niva3">
-        <div class="app-card-body">
-          <div class="app-card-top">
-            <div class="app-icon">🧠</div>
-            <div class="app-meta">
-              <div class="app-name">Quizr</div>
-              <span class="app-badge badge-alla">Alla nivåer</span>
-            </div>
-          </div>
-          <p class="app-desc">Träna begrepp med flashcards och quiz. Välj nivå, öva i din takt och se hur du förbättras.</p>
-        </div>
-        <div class="app-actions">
-          <a class="btn-primary" href="quizr.html">Öppna ↗</a>
-        </div>
-      </div>
-
-      <div class="app-card" data-levels="niva1">
-        <div class="app-card-body">
-          <div class="app-card-top">
-            <div class="app-icon">✍️</div>
-            <div class="app-meta">
-              <div class="app-name">Skrivlyckan</div>
-              <span class="app-badge badge-niva1">Nivå 1</span>
-            </div>
-          </div>
-          <p class="app-desc">Slumpar karaktär, karaktärsdrag, miljö och konflikt – perfekt startpunkt för kreativt skrivande.</p>
-        </div>
-        <div class="app-actions">
-          <a class="btn-primary" href="skrivlyckan.html">Öppna ↗</a>
-        </div>
-      </div>
-
-      <div class="app-card" data-levels="niva1">
-        <div class="app-card-body">
-          <div class="app-card-top">
-            <div class="app-icon rymdinvaders">🚀</div>
-            <div class="app-meta">
-              <div class="app-name">Rymdinvaders</div>
-              <span class="app-badge badge-niva1">Nivå 1</span>
-            </div>
-          </div>
-          <p class="app-desc">Space Invaders-spel för litteraturhistoria och grammatik. Skjut rätt svar – undvik fel!</p>
-        </div>
-        <div class="app-actions">
-          <a class="btn-primary" href="rymdinvaders.html">Öppna ↗</a>
-        </div>
-      </div>
-
+      <div class="loading-msg" id="loading-larappar">Laddar appar…</div>
     </div>
 
-    <p class="section-label" id="label-ovrigt">Övrigt</p>
-    <div class="app-grid" id="grid-ovrigt">
-
-      <div class="app-card" data-levels="ovrigt">
-        <div class="app-card-body">
-          <div class="app-card-top">
-            <div class="app-icon">🔔</div>
-            <div class="app-meta">
-              <div class="app-name">Buzzer</div>
-              <span class="app-badge badge-ovrigt">Övrigt</span>
-            </div>
-          </div>
-          <p class="app-desc">Buzzersystem för game show i klassrummet. Upp till fyra lag tävlar om att svara snabbast.</p>
-        </div>
-        <div class="app-actions">
-          <a class="btn-primary" href="buzzer.html">Öppna ↗</a>
-        </div>
-      </div>
-
-    </div>
+    <p class="section-label" id="label-ovrigt" style="display:none">Övrigt</p>
+    <div class="app-grid" id="grid-ovrigt" style="display:none"></div>
 
     <div class="about-strip">
       <div class="about-strip-icon">🌱</div>
@@ -448,56 +150,304 @@
         <p>Alla appar är byggda av Adam Kedert för elever på Göinge utbildningscenter, Östra Göinge kommun. Apparna är gratis, reklamfria och körs direkt i webbläsaren – inga konton eller installationer behövs.</p>
       </div>
     </div>
-
   </main>
 
   <footer>
     Göinge utbildningscenter &nbsp;·&nbsp; Östra Göinge kommun &nbsp;·&nbsp; Adam Kedert &nbsp;·&nbsp;
-    <span style="color:rgba(255,255,255,0.45)">Vibekodad med Claude (Anthropic)</span>
+    <span id="footer-trigger">Vibekodad med Claude (Anthropic)</span>
   </footer>
 
+  <!-- ADMIN-PANEL -->
+  <div class="admin-overlay" id="adminOverlay">
+    <div class="admin-panel">
+      <div class="admin-header">
+        <h2>⚙️ Hantera appar</h2>
+        <button class="admin-close" onclick="closeAdmin()">✕</button>
+      </div>
+      <div class="admin-body">
+        <div class="admin-divider">Befintliga appar</div>
+        <div class="admin-app-list" id="adminAppList"></div>
+        <div class="admin-divider">Lägg till ny app</div>
+        <div class="admin-form">
+          <div class="form-group">
+            <label>Namn</label>
+            <input type="text" id="f-name" placeholder="t.ex. Ordjakten" />
+          </div>
+          <div class="form-group">
+            <label>Ikon (emoji)</label>
+            <input type="text" id="f-icon" placeholder="t.ex. 🔍" maxlength="4" />
+          </div>
+          <div class="form-group">
+            <label>Länk (href)</label>
+            <input type="text" id="f-href" placeholder="t.ex. ordjakten.html" />
+          </div>
+          <div class="form-group">
+            <label>Nivå / Kategori</label>
+            <select id="f-level">
+              <option value="niva1 niva2 niva3">Alla nivåer</option>
+              <option value="niva1">Nivå 1</option>
+              <option value="niva2">Nivå 2</option>
+              <option value="niva3">Nivå 3</option>
+              <option value="ovrigt">Övrigt</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Beskrivning</label>
+            <input type="text" id="f-desc" placeholder="Kort beskrivning av appen" />
+          </div>
+          <button class="btn-add" id="btn-add" onclick="addApp()">+ Lägg till app</button>
+          <div class="admin-toast" id="adminToast"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    function toggleFullscreen() {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        document.documentElement.requestFullscreen
-          ? document.documentElement.requestFullscreen()
-          : document.documentElement.webkitRequestFullscreen();
-      } else {
-        document.exitFullscreen
-          ? document.exitFullscreen()
-          : document.webkitExitFullscreen();
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfyxrM1WCiq1BmTztkBVJmVXqLY_X71v6qMUtMUNLmOzkXJQ5bSspSSM9qYguJ04t4Tg/exec";
+
+    const LEVEL_COLOR = {
+      "niva1":             "var(--n1)",
+      "niva2":             "var(--n2)",
+      "niva3":             "var(--n3)",
+      "niva1 niva2 niva3": "var(--green)",
+      "ovrigt":            "var(--orange)"
+    };
+    const LEVEL_LABEL = {
+      "niva1":             "Nivå 1",
+      "niva2":             "Nivå 2",
+      "niva3":             "Nivå 3",
+      "niva1 niva2 niva3": "Alla nivåer",
+      "ovrigt":            "Övrigt"
+    };
+    const BADGE_CLASS = {
+      "niva1":             "badge-niva1",
+      "niva2":             "badge-niva2",
+      "niva3":             "badge-niva3",
+      "niva1 niva2 niva3": "badge-alla",
+      "ovrigt":            "badge-ovrigt"
+    };
+    const ICON_BG = {
+      "niva1":             "#fce8ea",
+      "niva2":             "#ede0f5",
+      "niva3":             "#d6f0f4",
+      "niva1 niva2 niva3": "var(--green-pale)",
+      "ovrigt":            "var(--orange-pale)"
+    };
+
+    // ── Hämta appar från Sheets ──
+    async function fetchApps() {
+      const res = await fetch(SCRIPT_URL + "?action=getAppar");
+      const data = await res.json();
+      return data;
+    }
+
+    // ── Bygg ett kort ──
+    function buildCard(app) {
+      const div = document.createElement("div");
+      div.className = "app-card";
+      div.dataset.levels = app.level;
+      div.style.border = "3px solid " + LEVEL_COLOR[app.level];
+      div.innerHTML =
+        '<div class="app-card-body">' +
+          '<div class="app-card-top">' +
+            '<div class="app-icon" style="background:' + ICON_BG[app.level] + '">' + app.icon + '</div>' +
+            '<div class="app-meta">' +
+              '<div class="app-name">' + app.name + '</div>' +
+              '<span class="app-badge ' + BADGE_CLASS[app.level] + '">' + LEVEL_LABEL[app.level] + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<p class="app-desc">' + app.desc + '</p>' +
+        '</div>' +
+        '<div class="app-actions">' +
+          '<a class="btn-open" href="' + app.href + '" style="background:' + LEVEL_COLOR[app.level] + '">Öppna &#8599;</a>' +
+        '</div>';
+      return div;
+    }
+
+    // ── Rendera alla kort ──
+    function renderApps(apps) {
+      const larappar = document.getElementById("grid-larappar");
+      const ovrigt   = document.getElementById("grid-ovrigt");
+      const ovrigtLabel = document.getElementById("label-ovrigt");
+
+      larappar.innerHTML = "";
+      ovrigt.innerHTML   = "";
+
+      apps.forEach(function(app) {
+        var card = buildCard(app);
+        if (app.level === "ovrigt") {
+          ovrigt.appendChild(card);
+        } else {
+          larappar.appendChild(card);
+        }
+      });
+
+      var hasOvrigt = apps.some(function(a) { return a.level === "ovrigt"; });
+      ovrigtLabel.style.display = hasOvrigt ? "" : "none";
+      ovrigt.style.display      = hasOvrigt ? "" : "none";
+    }
+
+    // ── Admin: rendera applista ──
+    function renderAdminList(apps) {
+      var list = document.getElementById("adminAppList");
+      list.innerHTML = "";
+      apps.forEach(function(app, i) {
+        var row = document.createElement("div");
+        row.className = "admin-app-row";
+        row.innerHTML =
+          '<div class="row-icon">' + app.icon + '</div>' +
+          '<div class="row-info">' +
+            '<div class="row-name">' + app.name + '</div>' +
+            '<div class="row-meta">' + app.href + ' &nbsp;·&nbsp; ' + LEVEL_LABEL[app.level] + '</div>' +
+          '</div>' +
+          '<div class="row-dot" style="background:' + LEVEL_COLOR[app.level] + '"></div>' +
+          '<button class="btn-delete" data-index="' + i + '">Ta bort</button>';
+        row.querySelector(".btn-delete").addEventListener("click", function() {
+          deleteApp(parseInt(this.dataset.index));
+        });
+        list.appendChild(row);
+      });
+    }
+
+    // ── Lägg till app ──
+    async function addApp() {
+      var name  = document.getElementById("f-name").value.trim();
+      var icon  = document.getElementById("f-icon").value.trim() || "📱";
+      var href  = document.getElementById("f-href").value.trim();
+      var level = document.getElementById("f-level").value;
+      var desc  = document.getElementById("f-desc").value.trim();
+
+      if (!name || !href || !desc) {
+        showToast("Fyll i namn, länk och beskrivning.", false);
+        return;
+      }
+
+      var btn = document.getElementById("btn-add");
+      btn.disabled = true;
+      btn.textContent = "Sparar…";
+
+      try {
+        var res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "addApp", name: name, icon: icon, href: href, level: level, desc: desc })
+        });
+        var data = await res.json();
+        if (data.success) {
+          document.getElementById("f-name").value = "";
+          document.getElementById("f-icon").value = "";
+          document.getElementById("f-href").value = "";
+          document.getElementById("f-desc").value = "";
+          var apps = await fetchApps();
+          renderApps(apps);
+          renderAdminList(apps);
+          showToast("✓ " + name + " lades till!", true);
+        } else {
+          showToast("Något gick fel. Försök igen.", false);
+        }
+      } catch(e) {
+        showToast("Kunde inte nå Google Sheets.", false);
+      }
+
+      btn.disabled = false;
+      btn.textContent = "+ Lägg till app";
+    }
+
+    // ── Ta bort app ──
+    async function deleteApp(index) {
+      if (!confirm("Ta bort denna app?")) return;
+      try {
+        var res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "deleteApp", index: index })
+        });
+        var data = await res.json();
+        if (data.success) {
+          var apps = await fetchApps();
+          renderApps(apps);
+          renderAdminList(apps);
+          showToast("App borttagen.", true);
+        } else {
+          showToast("Något gick fel.", false);
+        }
+      } catch(e) {
+        showToast("Kunde inte nå Google Sheets.", false);
       }
     }
 
+    function showToast(msg, ok) {
+      var t = document.getElementById("adminToast");
+      t.textContent = msg;
+      t.style.display = "block";
+      t.style.background = ok ? "var(--green-pale)" : "var(--orange-pale)";
+      t.style.border = ok ? "1.5px solid var(--green-light)" : "1.5px solid #f5c6a0";
+      t.style.color  = ok ? "var(--green-dark)" : "#8b3300";
+      setTimeout(function() { t.style.display = "none"; }, 3000);
+    }
+
+    // ── Admin öppna/stäng ──
+    function closeAdmin() { document.getElementById("adminOverlay").classList.remove("open"); }
+    document.getElementById("adminOverlay").addEventListener("click", function(e) {
+      if (e.target === this) closeAdmin();
+    });
+
+    // ── Trippelklick på footer ──
+    var clickCount = 0, clickTimer;
+    document.getElementById("footer-trigger").addEventListener("click", function() {
+      clickCount++;
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(function() { clickCount = 0; }, 600);
+      if (clickCount >= 3) {
+        clickCount = 0;
+        var pw = prompt("Lösenord:");
+        if (pw === "vänligkvartersspindel") {
+          fetchApps().then(function(apps) {
+            renderAdminList(apps);
+            document.getElementById("adminOverlay").classList.add("open");
+          });
+        } else if (pw !== null) {
+          alert("Fel lösenord.");
+        }
+      }
+    });
+
+    // ── Fullscreen ──
+    function toggleFullscreen() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        document.documentElement.requestFullscreen ? document.documentElement.requestFullscreen() : document.documentElement.webkitRequestFullscreen();
+      } else {
+        document.exitFullscreen ? document.exitFullscreen() : document.webkitExitFullscreen();
+      }
+    }
     document.addEventListener("fullscreenchange", updateFsBtn);
     document.addEventListener("webkitfullscreenchange", updateFsBtn);
-
     function updateFsBtn() {
-      const btn = document.getElementById("fsBtn");
+      var btn = document.getElementById("fsBtn");
       if (!btn) return;
-      const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      var isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
       btn.textContent = isFs ? "✕" : "⛶";
       btn.title = isFs ? "Avsluta helskärm" : "Helskärm";
     }
 
-    document.querySelectorAll(".filter-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    // ── Filter ──
+    document.querySelectorAll(".filter-btn").forEach(function(btn) {
+      btn.addEventListener("click", function() {
+        document.querySelectorAll(".filter-btn").forEach(function(b) { b.classList.remove("active"); });
         btn.classList.add("active");
-        const filter = btn.dataset.filter;
-
-        document.querySelectorAll("#grid-larappar .app-card").forEach(card => {
-          if (filter === "alla") {
-            card.classList.remove("hidden");
-          } else {
-            card.classList.toggle("hidden", !card.dataset.levels.includes(filter));
-          }
+        var filter = btn.dataset.filter;
+        document.querySelectorAll("#grid-larappar .app-card").forEach(function(card) {
+          card.classList.toggle("hidden", filter !== "alla" && !card.dataset.levels.includes(filter));
         });
-
-        const hideOvrigt = filter !== "alla";
+        var hideOvrigt = filter !== "alla";
         document.getElementById("grid-ovrigt").style.display = hideOvrigt ? "none" : "";
         document.getElementById("label-ovrigt").style.display = hideOvrigt ? "none" : "";
       });
+    });
+
+    // ── Init: hämta från Sheets ──
+    fetchApps().then(function(apps) {
+      renderApps(apps);
+    }).catch(function() {
+      document.getElementById("loading-larappar").textContent = "Kunde inte ladda appar. Kontrollera anslutningen.";
     });
   </script>
 
