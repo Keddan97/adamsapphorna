@@ -36,7 +36,6 @@
       flex-direction: column;
     }
 
-    /* ── HEADER ── */
     header {
       background: var(--green);
       padding: 0 24px;
@@ -59,11 +58,10 @@
       letter-spacing: 2px;
       line-height: 1;
       margin-top: 2px;
-      order: 1;
     }
 
-    .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); order: 2; }
-    .logo-img { height: 34px; width: auto; order: 3; }
+    .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
+    .logo-img { height: 34px; width: auto; }
 
     @media (max-width: 480px) {
       .logo-img { display: none; }
@@ -83,7 +81,6 @@
     }
     .fullscreen-btn:hover { background: rgba(255,255,255,0.15); }
 
-    /* ── HERO ── */
     .hero {
       background: var(--green);
       padding: 36px 24px 48px;
@@ -108,7 +105,6 @@
       line-height: 1.5;
     }
 
-    /* ── MAIN ── */
     main {
       flex: 1;
       max-width: 900px;
@@ -117,7 +113,6 @@
       padding: 40px 20px 60px;
     }
 
-    /* ── FILTRERINGSRAD ── */
     .filter-bar {
       display: flex;
       align-items: center;
@@ -150,39 +145,26 @@
       transition: background 0.15s, border-color 0.15s, color 0.15s;
     }
 
-    /* Alla – grön */
     .filter-btn[data-filter="alla"]:hover,
-    .filter-btn[data-filter="alla"].active {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff;
-    }
-
-    /* Nivå 1 – röd */
+    .filter-btn[data-filter="alla"].active   { background: var(--green); border-color: var(--green); color: #fff; }
     .filter-btn[data-filter="niva1"]:hover,
-    .filter-btn[data-filter="niva1"].active {
-      background: var(--n1);
-      border-color: var(--n1);
-      color: #fff;
-    }
-
-    /* Nivå 2 – lila */
+    .filter-btn[data-filter="niva1"].active  { background: var(--n1); border-color: var(--n1); color: #fff; }
     .filter-btn[data-filter="niva2"]:hover,
-    .filter-btn[data-filter="niva2"].active {
-      background: var(--n2);
-      border-color: var(--n2);
-      color: #fff;
-    }
-
-    /* Nivå 3 – turkos */
+    .filter-btn[data-filter="niva2"].active  { background: var(--n2); border-color: var(--n2); color: #fff; }
     .filter-btn[data-filter="niva3"]:hover,
-    .filter-btn[data-filter="niva3"].active {
-      background: var(--n3);
-      border-color: var(--n3);
-      color: #fff;
+    .filter-btn[data-filter="niva3"].active  { background: var(--n3); border-color: var(--n3); color: #fff; }
+
+    .section-label {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.12em;
+      color: var(--ink2);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
     }
 
-    /* ── APP GRID ── */
     .app-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -190,15 +172,14 @@
       margin-bottom: 48px;
     }
 
-    /* ── APP CARD ── */
+    /* ── KORT – tjock helborder i nivåfärg ── */
     .app-card {
       background: var(--card);
-      border: 1.5px solid var(--border);
       border-radius: var(--radius);
       padding: 0 0 20px 0;
       display: flex;
       flex-direction: column;
-      transition: border-color 0.18s, transform 0.15s;
+      transition: transform 0.15s, border-color 0.15s;
       overflow: hidden;
     }
 
@@ -206,17 +187,19 @@
     .app-card.coming-soon { opacity: 0.72; }
     .app-card.hidden { display: none; }
 
-    /* Färgad toppkant per nivå */
-    .app-card[data-levels="niva1"]         { border-top: 4px solid var(--n1); }
-    .app-card[data-levels="niva2"]         { border-top: 4px solid var(--n2); }
-    .app-card[data-levels="niva3"]         { border-top: 4px solid var(--n3); }
-    .app-card[data-levels="niva1 niva2 niva3"] { border-top: 4px solid var(--green); }
+    /* Tjock helborder per nivå */
+    .app-card[data-levels="niva1"]             { border: 3px solid var(--n1); }
+    .app-card[data-levels="niva2"]             { border: 3px solid var(--n2); }
+    .app-card[data-levels="niva3"]             { border: 3px solid var(--n3); }
+    .app-card[data-levels="niva1 niva2 niva3"] { border: 3px solid var(--green); }
+    .app-card[data-levels="ovrigt"]            { border: 3px solid var(--orange); }
 
-    .app-card:hover { border-color: var(--border); }
-    .app-card[data-levels="niva1"]:hover         { border-color: var(--n1); }
-    .app-card[data-levels="niva2"]:hover         { border-color: var(--n2); }
-    .app-card[data-levels="niva3"]:hover         { border-color: var(--n3); }
-    .app-card[data-levels="niva1 niva2 niva3"]:hover { border-color: var(--green-mid); }
+    /* Hover – lite mörkare */
+    .app-card[data-levels="niva1"]:hover             { border-color: #a82d38; }
+    .app-card[data-levels="niva2"]:hover             { border-color: #4a2560; }
+    .app-card[data-levels="niva3"]:hover             { border-color: #1f7a85; }
+    .app-card[data-levels="niva1 niva2 niva3"]:hover { border-color: var(--green-dark); }
+    .app-card[data-levels="ovrigt"]:hover            { border-color: #b84a00; }
 
     .app-card-body {
       padding: 20px 22px 0 22px;
@@ -243,13 +226,11 @@
       flex-shrink: 0;
     }
 
-    /* Ikonbakgrund matchar nivåfärg */
-    .app-card[data-levels="niva1"] .app-icon         { background: #fce8ea; }
-    .app-card[data-levels="niva2"] .app-icon         { background: #ede0f5; }
-    .app-card[data-levels="niva3"] .app-icon         { background: #d6f0f4; }
+    .app-card[data-levels="niva1"] .app-icon             { background: #fce8ea; }
+    .app-card[data-levels="niva2"] .app-icon             { background: #ede0f5; }
+    .app-card[data-levels="niva3"] .app-icon             { background: #d6f0f4; }
     .app-card[data-levels="niva1 niva2 niva3"] .app-icon { background: var(--green-pale); }
-
-    /* Rymdinvaders – behåll mörk bakgrund för rymdkänslan */
+    .app-card[data-levels="ovrigt"] .app-icon            { background: var(--orange-pale); }
     .app-card[data-levels="niva1"] .app-icon.rymdinvaders { background: #1A2410; }
 
     .app-meta { flex: 1; min-width: 0; }
@@ -278,7 +259,7 @@
     .badge-niva2  { background: #ede0f5; color: var(--n2); }
     .badge-niva3  { background: #d6f0f4; color: var(--n3); }
     .badge-alla   { background: var(--green-light); color: var(--green-dark); }
-    .badge-guide  { background: var(--orange-pale); color: #8b3300; }
+    .badge-ovrigt { background: var(--orange-pale); color: var(--orange); }
     .badge-coming { background: #eee; color: #888; }
 
     .app-desc {
@@ -308,11 +289,12 @@
     }
     .btn-primary:hover { filter: brightness(0.88); transform: scale(1.02); }
 
-    /* Knappfärg matchar nivå */
-    .app-card[data-levels="niva1"] .btn-primary         { background: var(--n1); }
-    .app-card[data-levels="niva2"] .btn-primary         { background: var(--n2); }
-    .app-card[data-levels="niva3"] .btn-primary         { background: var(--n3); }
-    .app-card[data-levels="niva1 niva2 niva3"] .btn-primary { background: var(--orange); }
+    /* Knappfärger – alla nivåer = grön, nivåspecifika = nivåfärg, övrigt = orange */
+    .app-card[data-levels="niva1"] .btn-primary             { background: var(--n1); }
+    .app-card[data-levels="niva2"] .btn-primary             { background: var(--n2); }
+    .app-card[data-levels="niva3"] .btn-primary             { background: var(--n3); }
+    .app-card[data-levels="niva1 niva2 niva3"] .btn-primary { background: var(--green); }
+    .app-card[data-levels="ovrigt"] .btn-primary            { background: var(--orange); }
 
     .btn-disabled {
       background: #e0e0e0;
@@ -327,7 +309,6 @@
       display: inline-block;
     }
 
-    /* ── ABOUT STRIP ── */
     .about-strip {
       background: var(--green-pale);
       border: 1.5px solid var(--border);
@@ -350,7 +331,6 @@
 
     .about-strip p { font-size: 0.92rem; color: var(--ink2); line-height: 1.55; }
 
-    /* ── FOOTER ── */
     footer {
       background: var(--green-dark);
       color: rgba(255,255,255,0.7);
@@ -363,7 +343,6 @@
 </head>
 <body>
 
-  <!-- HEADER -->
   <header>
     <div class="header-left">
       <span class="header-title">Adams apphörna</span>
@@ -373,13 +352,11 @@
     <button class="fullscreen-btn" id="fsBtn" onclick="toggleFullscreen()" title="Helskärm">⛶</button>
   </header>
 
-  <!-- HERO -->
   <div class="hero">
     <h1>Adams apphörna</h1>
     <p>Interaktiva lärappar för svenska på gymnasienivå&nbsp;– byggda för elever på Göinge&nbsp;utbildningscenter.</p>
   </div>
 
-  <!-- MAIN -->
   <main>
 
     <div class="filter-bar">
@@ -390,13 +367,13 @@
       <button class="filter-btn" data-filter="niva3">Nivå 3</button>
     </div>
 
-    <div class="app-grid">
+    <p class="section-label">Lärappar</p>
+    <div class="app-grid" id="grid-larappar">
 
-      <!-- QUIZR – alla nivåer, grön -->
       <div class="app-card" data-levels="niva1 niva2 niva3">
         <div class="app-card-body">
           <div class="app-card-top">
-            <div class="app-icon quizr">🃏</div>
+            <div class="app-icon">🧠</div>
             <div class="app-meta">
               <div class="app-name">Quizr</div>
               <span class="app-badge badge-alla">Alla nivåer</span>
@@ -409,11 +386,10 @@
         </div>
       </div>
 
-      <!-- SKRIVLYCKAN – nivå 1, röd -->
       <div class="app-card" data-levels="niva1">
         <div class="app-card-body">
           <div class="app-card-top">
-            <div class="app-icon skrivlyckan">✍️</div>
+            <div class="app-icon">✍️</div>
             <div class="app-meta">
               <div class="app-name">Skrivlyckan</div>
               <span class="app-badge badge-niva1">Nivå 1</span>
@@ -426,7 +402,6 @@
         </div>
       </div>
 
-      <!-- RYMDINVADERS – nivå 1, röd -->
       <div class="app-card" data-levels="niva1">
         <div class="app-card-body">
           <div class="app-card-top">
@@ -443,37 +418,24 @@
         </div>
       </div>
 
-      <!-- AI STUDY BUDDY – alla nivåer, grön -->
-      <div class="app-card" data-levels="niva1 niva2 niva3">
-        <div class="app-card-body">
-          <div class="app-card-top">
-            <div class="app-icon ai-buddy">🤖</div>
-            <div class="app-meta">
-              <div class="app-name">AI som study-buddy</div>
-              <span class="app-badge badge-guide">Guide</span>
-            </div>
-          </div>
-          <p class="app-desc">Lär dig använda AI smart och etiskt som studiehjälp – utan att fuska, men med full kraft.</p>
-        </div>
-        <div class="app-actions">
-          <a class="btn-primary" href="ai-buddy.html">Öppna ↗</a>
-        </div>
-      </div>
+    </div>
 
-      <!-- KOMMANDE -->
-      <div class="app-card coming-soon" data-levels="niva1 niva2 niva3">
+    <p class="section-label" id="label-ovrigt">Övrigt</p>
+    <div class="app-grid" id="grid-ovrigt">
+
+      <div class="app-card" data-levels="ovrigt">
         <div class="app-card-body">
           <div class="app-card-top">
-            <div class="app-icon coming">🔮</div>
+            <div class="app-icon">🔔</div>
             <div class="app-meta">
-              <div class="app-name">Kommande</div>
-              <span class="app-badge badge-coming">Snart</span>
+              <div class="app-name">Buzzer</div>
+              <span class="app-badge badge-ovrigt">Övrigt</span>
             </div>
           </div>
-          <p class="app-desc">Nästa app är på väg. Håll utkik – fler interaktiva verktyg för svenska är under utveckling.</p>
+          <p class="app-desc">Buzzersystem för game show i klassrummet. Upp till fyra lag tävlar om att svara snabbast.</p>
         </div>
         <div class="app-actions">
-          <span class="btn-disabled">Kommer snart</span>
+          <a class="btn-primary" href="buzzer.html">Öppna ↗</a>
         </div>
       </div>
 
@@ -523,14 +485,18 @@
         document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
         const filter = btn.dataset.filter;
-        document.querySelectorAll(".app-card").forEach(card => {
+
+        document.querySelectorAll("#grid-larappar .app-card").forEach(card => {
           if (filter === "alla") {
             card.classList.remove("hidden");
           } else {
-            const levels = card.dataset.levels || "";
-            card.classList.toggle("hidden", !levels.includes(filter));
+            card.classList.toggle("hidden", !card.dataset.levels.includes(filter));
           }
         });
+
+        const hideOvrigt = filter !== "alla";
+        document.getElementById("grid-ovrigt").style.display = hideOvrigt ? "none" : "";
+        document.getElementById("label-ovrigt").style.display = hideOvrigt ? "none" : "";
       });
     });
   </script>
