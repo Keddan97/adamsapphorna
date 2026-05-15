@@ -292,8 +292,13 @@ const API = "https://script.google.com/macros/s/AKfycbxEZFZhuuulLUeDH1CpspKNShTy
 
 let allFragor=[], nivaFragor=[], filteredFragor=[], sessionStats={};
 let mode="flashcard", currentIndex=0, isFlipped=false, answered=false;
-let selectedKat="Alla", selectedNiva=null, isChallengeMode=false;
+let selectedKats=new Set(), selectedNiva=null, isChallengeMode=false;
 let globalStats={};
+
+function getKategorier(f) {
+  if(!f.kategori) return [];
+  return f.kategori.split(",").map(k=>k.trim()).filter(Boolean);
+}
 
 // ---- INIT ----
 async function init() {
@@ -379,13 +384,13 @@ function showNivaScreen() {
 }
 
 function selectNiva(niva) {
-  selectedNiva=niva; isChallengeMode=false;
+  selectedNiva=niva; isChallengeMode=false; selectedKats.clear();
   nivaFragor=niva?allFragor.filter(f=>f.niva===niva):allFragor;
   showAppScreen();
 }
 
 function selectChallenge(niva) {
-  selectedNiva=niva; isChallengeMode=true;
+  selectedNiva=niva; isChallengeMode=true; selectedKats.clear();
   const stats=globalStats[niva]||[];
   const hardBegrepp=new Set(stats.filter(s=>s.totalt>=5&&s.pctRatt<60).map(s=>s.begrepp));
   nivaFragor=allFragor.filter(f=>f.niva===niva&&hardBegrepp.has(f.begrepp));
@@ -395,9 +400,9 @@ function selectChallenge(niva) {
 
 // ---- APP-SKÄRM ----
 function showAppScreen() {
-  selectedKat="Alla"; sessionStats={};
-  const kats=["Alla",...new Set(nivaFragor.map(f=>f.kategori).filter(Boolean))];
-  const filterHTML=kats.map(k=>`<button class="cat-btn${k==="Alla"?" active":""}" onclick="selectKat('${k}')">${k}</button>`).join("");
+  selectedKats.clear(); sessionStats={};
+  const kats=[...new Set(nivaFragor.flatMap(f=>getKategorier(f)).filter(Boolean))].sort();
+  const filterHTML=[`<button class="cat-btn active" onclick="selectKat('Alla')">Alla</button>`,...kats.map(k=>`<button class="cat-btn" onclick="selectKat('${k}')">${k}</button>`)].join("");
   const challengeBanner=isChallengeMode?`<div class="challenge-banner">⚡ Utmaningsläge — de svåraste begreppen</div>`:"";
   // Dölj kategorifilter i utmaningsläge
   const filterVisible=!isChallengeMode;
@@ -423,15 +428,30 @@ function showAppScreen() {
 }
 
 function selectKat(k) {
-  selectedKat=k;
-  const kats=["Alla",...new Set(nivaFragor.map(f=>f.kategori).filter(Boolean))];
-  document.getElementById("filterBar").innerHTML=
-    kats.map(k2=>`<button class="cat-btn${k2===k?" active":""}" onclick="selectKat('${k2}')">${k2}</button>`).join("");
+  if(k==="Alla") {
+    selectedKats.clear();
+  } else {
+    if(selectedKats.has(k)) selectedKats.delete(k);
+    else selectedKats.add(k);
+  }
+  renderFilterBar();
   applyFilter();
 }
 
+function renderFilterBar() {
+  const kats=[...new Set(nivaFragor.flatMap(f=>getKategorier(f)).filter(Boolean))].sort();
+  const alleAktiv=selectedKats.size===0;
+  document.getElementById("filterBar").innerHTML=
+    [`<button class="cat-btn${alleAktiv?" active":""}" onclick="selectKat('Alla')">Alla</button>`,
+     ...kats.map(k=>`<button class="cat-btn${selectedKats.has(k)?" active":""}" onclick="selectKat('${k}')">${k}</button>`)
+    ].join("");
+}
+
+
 function applyFilter() {
-  filteredFragor=selectedKat==="Alla"?shuffle([...nivaFragor]):shuffle(nivaFragor.filter(f=>f.kategori===selectedKat));
+  filteredFragor = selectedKats.size===0
+    ? shuffle([...nivaFragor])
+    : shuffle(nivaFragor.filter(f => getKategorier(f).some(k => selectedKats.has(k))));
   currentIndex=0; sessionStats={};
   renderCurrent();
 }
@@ -468,7 +488,7 @@ function renderFlashcard(){
         <div class="card-face front">
           <div class="card-label">Begrepp</div>
           <div class="card-begrepp">${f.begrepp}</div>
-          ${f.kategori?`<div class="card-kategori">${f.kategori}</div>`:""}
+          ${f.kategori?`<div class="card-kategori">${getKategorier(f).join(" · ")}</div>`:""}
           <div class="card-hint">Tryck för att se förklaring</div>
         </div>
         <div class="card-face back">
