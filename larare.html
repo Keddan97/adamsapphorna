@@ -201,7 +201,7 @@
         <h3>Lägg till begrepp</h3>
         <div class="form-row">
           <div><label>Begrepp</label><input type="text" id="newBegrepp" placeholder="T.ex. Epik" list="kategoriListB"></div>
-          <div><label>Kategori</label>
+          <div><label>Kategori <span style='font-weight:400;font-size:0.78rem;color:var(--ink2);'>(komma-separera flera)</span></label>
             <div class="combo-wrap" id="komboNy">
               <input type="text" class="combo-input" id="newKategori" placeholder="Välj eller skriv ny…" autocomplete="off" oninput="filterKombo('komboNy','newKategori')" onfocus="openKombo('komboNy','newKategori')">
               <div class="combo-arrow" onclick="toggleKombo('komboNy','newKategori')">&#9660;</div>
@@ -334,7 +334,8 @@ function selectBegreppNiva(niva) {
 }
 
 function renderKatFilter() {
-  const kats=["Alla",...new Set(allFragor.filter(f=>f.niva===selectedBegreppNiva).map(f=>f.kategori).filter(Boolean)).values()].sort();
+  const kats=["Alla",...new Set(allFragor.filter(f=>f.niva===selectedBegreppNiva)
+    .flatMap(f=>f.kategori?f.kategori.split(",").map(k=>k.trim()).filter(Boolean):[]))].sort();
   document.getElementById("katFilter").innerHTML=kats.map(k=>
     `<button class="cat-filter-btn${k===selectedKat?" active":""}" onclick="selectKatFilter('${k.replace(/'/,"\'")}')">${k}</button>`
   ).join("");
@@ -349,6 +350,7 @@ function selectKatFilter(kat) {
 function renderBegreppList() {
   const q=(document.getElementById("searchInput").value||"").toLowerCase();
   let fragor=allFragor.filter(f=>f.niva===selectedBegreppNiva);
+  if(selectedKat!=='Alla') fragor=fragor.filter(f=>getKatLista(f).includes(selectedKat));
   if(selectedKat!=="Alla") fragor=fragor.filter(f=>f.kategori===selectedKat);
   if(q) fragor=fragor.filter(f=>f.begrepp.toLowerCase().includes(q)||f.forklaring.toLowerCase().includes(q));
   fragor.sort((a,b)=>a.begrepp.localeCompare(b.begrepp,"sv"));
@@ -360,7 +362,7 @@ function renderBegreppList() {
         <div class="begrepp-text">
           <div class="begrepp-name">${f.begrepp}</div>
           <div class="begrepp-forklaring">${f.forklaring}</div>
-          ${f.kategori?`<div class="begrepp-kat">${f.kategori}</div>`:""}
+          ${f.kategori?`<div class="begrepp-kat">${getKatLista(f).join(" · ")}</div>`:""}
         </div>
         <div class="begrepp-actions">
           <button class="btn-edit" onclick="toggleEdit('${esc(f.begrepp)}','${esc(f.forklaring)}','${esc(f.kategori||"")}')">Redigera</button>
@@ -424,7 +426,13 @@ async function sparaEdit(gammaltBegrepp) {
 }
 
 function getKats() {
-  return [...new Set(allFragor.filter(f=>f.niva===selectedBegreppNiva).map(f=>f.kategori).filter(Boolean))].sort();
+  const all = allFragor.filter(f=>f.niva===selectedBegreppNiva)
+    .flatMap(f => f.kategori ? f.kategori.split(",").map(k=>k.trim()).filter(Boolean) : []);
+  return [...new Set(all)].sort();
+}
+
+function getKatLista(f) {
+  return f.kategori ? f.kategori.split(",").map(k=>k.trim()).filter(Boolean) : [];
 }
 function updateKategoriList(){ /* behålls för kompatibilitet */ }
 
@@ -453,14 +461,26 @@ function renderKomboOptions(wrapId, inputId, kats, filter) {
   if(!dd) return;
   const filtered = filter ? kats.filter(k=>k.toLowerCase().includes(filter)) : kats;
   const inputVal = document.getElementById(inputId).value.trim();
-  let html = filtered.map(k=>
-    `<div class="combo-option" onmousedown="pickKombo('${wrapId}','${inputId}','${k.replace(/'/g,"\'")}')">  ${k}</div>`
-  ).join("");
+  let items = filtered.map(k=>{
+    const div = document.createElement("div");
+    div.className = "combo-option";
+    div.textContent = k;
+    div.addEventListener("mousedown", e=>{ e.preventDefault(); pickKombo(wrapId, inputId, k); });
+    return div;
+  });
   if(inputVal && !kats.some(k=>k.toLowerCase()===inputVal.toLowerCase())) {
-    html += `<div class="combo-option new-kat" onmousedown="pickKombo('${wrapId}','${inputId}','${inputVal.replace(/'/g,"\'")}')">+ Skapa "${inputVal}"</div>`;
+    const div = document.createElement("div");
+    div.className = "combo-option new-kat";
+    div.textContent = `+ Skapa "${inputVal}"`;
+    div.addEventListener("mousedown", e=>{ e.preventDefault(); pickKombo(wrapId, inputId, inputVal); });
+    items.push(div);
   }
-  if(!html) html = `<div style="padding:9px 14px;font-size:0.88rem;color:var(--ink2);">Inga kategorier ännu</div>`;
-  dd.innerHTML = html;
+  dd.innerHTML = "";
+  if(items.length === 0) {
+    dd.innerHTML = `<div style="padding:9px 14px;font-size:0.88rem;color:var(--ink2);">Inga kategorier ännu</div>`;
+  } else {
+    items.forEach(el => dd.appendChild(el));
+  }
 }
 
 function pickKombo(wrapId, inputId, val) {
