@@ -153,11 +153,11 @@
     padding: clamp(28px,4vw,52px) clamp(24px,5vw,60px);
     min-height: clamp(200px, 30vw, 320px);
   }
-  .card-face.front { border-top:4px solid var(--green); }
+  .card-face.front { border:4px solid var(--green); }
   .card-face.back {
     position:absolute; inset:0;
     transform:rotateY(180deg);
-    border-top:4px solid var(--orange);
+    border:4px solid var(--orange);
     background:var(--green-pale);
   }
   /* Front is in flow (sets height), back is absolute */
@@ -196,7 +196,7 @@
   /* QUIZ */
   .quiz-question {
     width:100%; max-width:720px; background:var(--card);
-    border:1.5px solid var(--border); border-top:4px solid var(--green);
+    border:4px solid var(--green);
     border-radius:var(--radius);
     padding:clamp(20px,3vw,36px) clamp(20px,4vw,40px); margin-bottom:16px;
   }
@@ -225,9 +225,10 @@
   .next-btn:hover { opacity:0.87; }
 
   /* PROGRESS */
-  .progress-bar-wrap { width:100%; max-width:720px; height:5px; background:var(--green-light); border-radius:3px; margin-bottom:8px; }
+  .progress-static { width:100%; max-width:720px; flex-shrink:0; margin-bottom:0; }
+  .progress-bar-wrap { width:100%; max-width:720px; height:5px; background:var(--green-light); border-radius:3px; margin-bottom:8px; flex-shrink:0; }
+  .progress-text { font-size:0.8rem; color:var(--ink2); margin-bottom:20px; text-align:center; flex-shrink:0; }
   .progress-bar { height:100%; background:var(--green); border-radius:3px; transition:width 0.3s; }
-  .progress-text { font-size:0.8rem; color:var(--ink2); margin-bottom:20px; text-align:center; }
 
   /* DONE */
   .done-card {
@@ -256,6 +257,39 @@
   .sending { font-size:0.8rem; color:var(--ink2); text-align:center; margin-top:8px; }
 
   /* FOOTER */
+  /* BEGREPPSLISTA */
+  .lista-wrap { width:100%; max-width:720px; }
+  .lista-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+  .lista-header h2 { font-size:1.1rem; font-weight:600; color:var(--ink); }
+  .lista-print-btn {
+    border:1.5px solid var(--border); background:var(--card); color:var(--ink2);
+    padding:8px 18px; border-radius:50px; font-family:"Source Sans 3",sans-serif;
+    font-size:0.85rem; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:6px;
+    transition:border-color 0.15s, color 0.15s;
+  }
+  .lista-print-btn:hover { border-color:var(--green); color:var(--green); }
+  .lista-table { width:100%; border-collapse:collapse; background:var(--card); border-radius:var(--radius); overflow:hidden; border:4px solid var(--green); }
+  .lista-table thead tr { background:var(--green); }
+  .lista-table th { padding:12px 18px; text-align:left; color:#fff; font-weight:600; font-size:0.85rem; letter-spacing:0.5px; }
+  .lista-table td { padding:12px 18px; border-bottom:1px solid var(--border); font-size:0.93rem; vertical-align:top; line-height:1.5; }
+  .lista-table tr:last-child td { border-bottom:none; }
+  .lista-table tr:nth-child(even) td { background:var(--green-pale); }
+  .lista-begrepp { font-weight:600; color:var(--ink); }
+  .lista-kat { font-size:0.75rem; color:var(--orange); font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-top:3px; }
+  .lista-empty { color:var(--ink2); font-size:0.9rem; text-align:center; padding:32px 0; }
+
+  @media print {
+    header, footer, .mode-selector, .filter-bar, .back-btn, .lista-print-btn, .challenge-banner { display:none !important; }
+    body { background:#fff; }
+    .lista-wrap { max-width:100%; }
+    .lista-table { border:1px solid #ccc; }
+    .lista-table thead tr { background:#568E14 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .lista-table th { color:#fff !important; }
+    .lista-table tr:nth-child(even) td { background:#EFF7E0 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .print-title { display:block !important; }
+  }
+  .print-title { display:none; font-family:"Source Sans 3",sans-serif; font-size:1.1rem; font-weight:600; margin-bottom:12px; color:#1A2410; }
+
   footer { background:var(--green-dark); text-align:center; padding:12px; font-size:0.72rem; color:rgba(255,255,255,0.45); letter-spacing:0.3px; }
 </style>
 </head>
@@ -291,7 +325,7 @@
 const API = "https://script.google.com/macros/s/AKfycbxEZFZhuuulLUeDH1CpspKNShTykj_GS3Snk1aKO1TwAvUyvwKlBtkvJGUzUhvuX1QVHA/exec";
 
 let allFragor=[], nivaFragor=[], filteredFragor=[], sessionStats={};
-let mode="flashcard", currentIndex=0, isFlipped=false, answered=false;
+let mode="lista", currentIndex=0, isFlipped=false, answered=false;
 let selectedKats=new Set(), selectedNiva=null, isChallengeMode=false;
 let globalStats={};
 
@@ -338,6 +372,7 @@ document.addEventListener("keydown", e => {
 // ---- NIVÅ-SKÄRM ----
 function showNivaScreen() {
   selectedNiva=null; isChallengeMode=false;
+  const pc=document.getElementById("progressContainer"); if(pc) pc.style.display="none";
   const nivaer=[...new Set(allFragor.map(f=>f.niva).filter(Boolean))].sort();
   if(nivaer.length===0){selectNiva(null);return;}
 
@@ -353,7 +388,6 @@ function showNivaScreen() {
       <div class="niva-badge ${bc}">${num}</div>
       <div class="niva-text-wrap">
         <span class="niva-name">${label}</span>
-        <span class="niva-count">${count} begrepp</span>
       </div>
     </button>`;
   }).join("");
@@ -384,10 +418,11 @@ function showNivaScreen() {
 }
 
 function selectNiva(niva) {
-  selectedNiva=niva; isChallengeMode=false; selectedKats.clear();
+  selectedNiva=niva; isChallengeMode=false; selectedKats.clear(); mode="lista";
   nivaFragor=niva?allFragor.filter(f=>f.niva===niva):allFragor;
   showAppScreen();
 }
+
 
 function selectChallenge(niva) {
   selectedNiva=niva; isChallengeMode=true; selectedKats.clear();
@@ -411,7 +446,8 @@ function showAppScreen() {
   const modeHTML = isChallengeMode
     ? `<div class="mode-selector"><button class="mode-btn active" onclick="setMode('quiz')">Quiz</button></div>`
     : `<div class="mode-selector">
-        <button class="mode-btn active" onclick="setMode('flashcard')">Flashcard</button>
+        <button class="mode-btn active" onclick="setMode('lista')">Begreppslista</button>
+        <button class="mode-btn" onclick="setMode('flashcard')">Flashcard</button>
         <button class="mode-btn" onclick="setMode('quiz')">Quiz</button>
        </div>`;
 
@@ -420,6 +456,10 @@ function showAppScreen() {
     ${challengeBanner}
     ${modeHTML}
     ${filterVisible ? `<div class="filter-bar" id="filterBar">${filterHTML}</div>` : ""}
+    <div class="progress-container" id="progressContainer" style="width:100%;max-width:720px;display:none;">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+      <div class="progress-text" id="progressText">0 / 0</div>
+    </div>
     <div id="app"></div>
     <div class="sending" id="sendingMsg" style="display:none">Sparar resultat…</div>`;
 
@@ -449,17 +489,24 @@ function renderFilterBar() {
 
 
 function applyFilter() {
-  filteredFragor = selectedKats.size===0
-    ? shuffle([...nivaFragor])
-    : shuffle(nivaFragor.filter(f => getKategorier(f).some(k => selectedKats.has(k))));
+  const base = selectedKats.size===0
+    ? [...nivaFragor]
+    : nivaFragor.filter(f => getKategorier(f).some(k => selectedKats.has(k)));
+  filteredFragor = mode==="lista" ? base : shuffle(base);
   currentIndex=0; sessionStats={};
   renderCurrent();
 }
 
 function setMode(m) {
   mode=m;
-  document.querySelectorAll(".mode-btn").forEach(b=>b.classList.toggle("active",
-    b.textContent.toLowerCase().includes(m==="flashcard"?"flash":"quiz")));
+  document.querySelectorAll(".mode-btn").forEach(b=>{
+    const t=b.textContent.toLowerCase();
+    b.classList.toggle("active",
+      (m==="lista"&&t.includes("lista"))||
+      (m==="flashcard"&&t.includes("flash"))||
+      (m==="quiz"&&t.includes("quiz"))
+    );
+  });
   applyFilter();
 }
 
@@ -468,14 +515,20 @@ function renderCurrent() {
   const app=document.getElementById("app");
   if(!app) return;
   if(filteredFragor.length===0){app.innerHTML=`<div class="status">Inga begrepp i den här kategorin.<br><br><button class="done-btn secondary" style="margin-top:8px" onclick="showNivaScreen()">← Tillbaka</button></div>`;return;}
+  if(mode==="lista"){renderLista();return;}
   if(currentIndex>=filteredFragor.length){renderDone();return;}
   mode==="flashcard"?renderFlashcard():renderQuiz();
 }
 
 function progressHTML(){
   const pct=filteredFragor.length>0?Math.round((currentIndex/filteredFragor.length)*100):0;
-  return `<div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>
-          <div class="progress-text">${currentIndex} / ${filteredFragor.length}</div>`;
+  const pc=document.getElementById("progressContainer");
+  const pb=document.getElementById("progressBar");
+  const pt=document.getElementById("progressText");
+  if(pc){pc.style.display="block";}
+  if(pb){pb.style.width=pct+"%";}
+  if(pt){pt.textContent=currentIndex+" / "+filteredFragor.length;}
+  return ""; // progress rendered in fixed container
 }
 
 // ---- FLASHCARD ----
@@ -560,7 +613,48 @@ function quizSvar(el,ratt,begrepp){
 }
 
 // ---- DONE ----
+function renderLista() {
+  const app = document.getElementById("app");
+  if(!app) return;
+  const pc=document.getElementById("progressContainer"); if(pc) pc.style.display="none";
+  const sorted = [...filteredFragor].sort((a,b)=>a.begrepp.localeCompare(b.begrepp,"sv"));
+  const nivaLabel = selectedNiva ? (selectedNiva.toLowerCase().startsWith("nivå") ? "Svenska "+selectedNiva : selectedNiva) : "Alla nivåer";
+  const katLabel = selectedKats.size===0 ? "Alla kategorier" : [...selectedKats].join(", ");
+  const titel = nivaLabel + (selectedKats.size>0 ? " – " + katLabel : "");
+
+  app.innerHTML = `
+    <div class="lista-wrap">
+      <div class="print-title">${titel}</div>
+      <div class="lista-header">
+        <h2>${sorted.length} begrepp${selectedKats.size>0?" – "+katLabel:""}</h2>
+        <button class="lista-print-btn" onclick="skrivUtLista('${titel}')">🖨 Skriv ut / Spara</button>
+      </div>
+      <table class="lista-table">
+        <thead><tr><th>Begrepp</th><th>Förklaring</th><th>Kategori</th></tr></thead>
+        <tbody>
+          ${sorted.map(f=>`
+            <tr>
+              <td><div class="lista-begrepp">${f.begrepp}</div></td>
+              <td>${f.forklaring}</td>
+              <td>${getKategorier(f).map(k=>`<div class="lista-kat">${k}</div>`).join("")}</td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function skrivUtLista(titel) {
+  // Sätt sidtitel för utskrift
+  const prevTitle = document.title;
+  document.querySelector(".print-title").style.display = "block";
+  document.title = titel + " – Quizr";
+  window.print();
+  document.title = prevTitle;
+  setTimeout(()=>{ const pt=document.querySelector(".print-title"); if(pt) pt.style.display="none"; }, 500);
+}
+
 function renderDone(){
+  const pc=document.getElementById("progressContainer"); if(pc) pc.style.display="none";
   const total=Object.values(sessionStats).reduce((s,v)=>s+v.ratt+v.fel,0);
   const ratt=Object.values(sessionStats).reduce((s,v)=>s+v.ratt,0);
   const pct=total>0?Math.round((ratt/total)*100):0;
