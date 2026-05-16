@@ -66,15 +66,34 @@
     .badge-niva2  { background: #ede0f5; color: var(--n2); }
     .badge-niva3  { background: #d6f0f4; color: var(--n3); }
     .badge-alla   { background: var(--green-light); color: var(--green-dark); }
-    .badge-övrigt  { background: var(--orange-pale); color: #8b3300; }
+    .badge-ovrigt  { background: var(--orange-pale); color: #8b3300; }
     .badge-coming { background: #eee; color: #888; }
     .app-desc { font-size: 0.92rem; color: var(--ink2); line-height: 1.5; flex: 1; margin-bottom: 18px; }
     .app-actions { padding: 0 22px; display: flex; gap: 8px; align-items: center; }
     .btn-open { border: none; border-radius: 50px; padding: 9px 22px; font-family: "Source Sans 3", sans-serif; font-size: 0.93rem; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: filter 0.15s, transform 0.1s; color: #fff; }
     .btn-open:hover { filter: brightness(0.88); transform: scale(1.02); }
-    
+    .btn-coming { border: 2px solid #ccc; border-radius: 50px; padding: 9px 22px; font-family: "Source Sans 3", sans-serif; font-size: 0.93rem; font-weight: 700; background: #f0f0f0; color: #aaa; cursor: default; display: inline-flex; align-items: center; gap: 6px; }
+
     /* Laddningsindikator */
     .loading-msg { text-align: center; color: var(--ink2); font-size: 0.95rem; padding: 32px 0; }
+    .loading-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 36px 0; grid-column: 1 / -1; }
+    .spinner { width: 36px; height: 36px; border: 4px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-wrap p { color: var(--ink2); font-size: 0.95rem; }
+
+    /* Emoji-väljare */
+    .emoji-picker-wrap { position: relative; }
+    .emoji-trigger { background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 12px; font-size: 1.5rem; cursor: pointer; width: 100%; text-align: left; line-height: 1; transition: border-color 0.15s; display: flex; align-items: center; gap: 8px; }
+    .emoji-trigger:focus { border-color: var(--green); outline: none; }
+    .emoji-trigger .trigger-label { font-size: 0.85rem; color: var(--ink2); font-family: "Source Sans 3", sans-serif; }
+    .emoji-panel { display: none; position: fixed; background: #fff; border: 1.5px solid var(--border); border-radius: 14px; box-shadow: 0 10px 40px rgba(0,0,0,0.18); z-index: 500; padding: 14px; width: 340px; max-width: 95vw; }
+    .emoji-panel.open { display: block; }
+    .emoji-cats { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: wrap; }
+    .emoji-cat-btn { background: none; border: 1.5px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.82rem; cursor: pointer; color: var(--ink2); font-weight: 600; transition: background 0.12s; }
+    .emoji-cat-btn.active, .emoji-cat-btn:hover { background: var(--green-pale); border-color: var(--green); color: var(--green-dark); }
+    .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 3px; max-height: 220px; overflow-y: auto; }
+    .emoji-btn { background: none; border: none; font-size: 1.65rem; cursor: pointer; padding: 5px; border-radius: 8px; transition: background 0.1s; line-height: 1; }
+    .emoji-btn:hover { background: var(--green-pale); }
 
     .about-strip { background: var(--green-pale); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 22px 24px; display: flex; gap: 16px; align-items: flex-start; }
     .about-strip-icon { font-size: 1.6rem; flex-shrink: 0; margin-top: 2px; }
@@ -84,15 +103,37 @@
     footer { background: var(--green-dark); color: rgba(255,255,255,0.7); font-size: 0.78rem; text-align: center; padding: 14px 16px; line-height: 1.7; }
     #footer-trigger { cursor: default; user-select: none; color: rgba(255,255,255,0.45); }
 
+    /* ══ ADMIN-INLOGGNING ══ */
+    .admin-login-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500; flex-direction: column; }
+    .admin-login-overlay.open { display: flex; }
+    .admin-login-header { background: var(--green); padding: 0 24px; display: flex; align-items: center; gap: 14px; height: 64px; flex-shrink: 0; }
+    .admin-login-header .header-title { font-family: "Bebas Neue", sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; line-height: 1; margin-top: 2px; }
+    .admin-login-header .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
+    .admin-login-header .header-sub { color: rgba(255,255,255,0.85); font-size: 0.88rem; font-weight: 500; }
+    .admin-login-main { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 48px 16px 64px; }
+    .admin-login-card { width: 100%; max-width: 400px; background: var(--card); border: 4px solid var(--green); border-radius: var(--radius); padding: 40px 36px; text-align: center; }
+    .admin-login-card h2 { font-family: "Bebas Neue", sans-serif; font-size: 1.8rem; letter-spacing: 0.05em; color: var(--ink); margin-bottom: 6px; }
+    .admin-login-card p { font-size: 0.88rem; color: var(--ink2); margin-bottom: 28px; line-height: 1.5; }
+    .admin-login-error { color: var(--n1); font-size: 0.85rem; margin-bottom: 12px; display: none; }
+    .admin-login-input { width: 100%; border: 1.5px solid var(--border); background: var(--bg); padding: 11px 14px; border-radius: 10px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; color: var(--ink); margin-bottom: 14px; outline: none; transition: border-color 0.15s; }
+    .admin-login-input:focus { border-color: var(--green); }
+    .admin-login-btn { width: 100%; border: none; background: var(--green); color: #fff; padding: 13px; border-radius: 50px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+    .admin-login-btn:hover { opacity: 0.87; }
+    .admin-login-cancel { display: block; margin-top: 14px; font-size: 0.85rem; color: var(--ink2); cursor: pointer; background: none; border: none; font-family: "Source Sans 3", sans-serif; }
+    .admin-login-cancel:hover { color: var(--ink); text-decoration: underline; }
+
     /* ══ ADMIN-PANEL ══ */
-    .admin-overlay { display: none; position: fixed; inset: 0; background: rgba(10,20,5,0.55); z-index: 200; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto; }
+    .admin-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; flex-direction: column; }
     .admin-overlay.open { display: flex; }
-    .admin-panel { background: var(--card); border-radius: 18px; width: 100%; max-width: 640px; box-shadow: 0 8px 40px rgba(0,0,0,0.18); overflow: hidden; margin: auto; }
-    .admin-header { background: var(--green-dark); color: #fff; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; }
-    .admin-header h2 { font-family: "Bebas Neue", sans-serif; font-size: 1.6rem; letter-spacing: 0.06em; }
-    .admin-close { background: none; border: none; color: rgba(255,255,255,0.8); font-size: 1.4rem; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+    .admin-panel-header { background: var(--green-dark); padding: 0 24px; display: flex; align-items: center; gap: 14px; height: 64px; flex-shrink: 0; }
+    .admin-panel-header .header-title { font-family: "Bebas Neue", sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; line-height: 1; margin-top: 2px; }
+    .admin-panel-header .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
+    .admin-panel-header .header-sub { color: rgba(255,255,255,0.85); font-size: 0.88rem; font-weight: 500; flex: 1; }
+    .admin-close { background: none; border: none; color: rgba(255,255,255,0.8); font-size: 1.4rem; cursor: pointer; padding: 6px 10px; border-radius: 6px; transition: background 0.15s; margin-left: auto; }
     .admin-close:hover { background: rgba(255,255,255,0.15); }
-    .admin-body { padding: 24px; }
+    .admin-panel-main { flex: 1; overflow-y: auto; display: flex; justify-content: center; padding: 40px 20px 60px; }
+    .admin-panel { background: var(--card); border-radius: var(--radius); width: 100%; max-width: 700px; overflow: hidden; border: 2px solid var(--border); }
+    .admin-panel-inner { padding: 28px 32px; }
     .admin-divider { font-family: "Bebas Neue", sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: var(--ink2); margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
     .admin-app-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
     .admin-app-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; }
@@ -103,8 +144,8 @@
     .admin-app-row .row-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .btn-delete { background: none; border: 1.5px solid #e0b0b4; border-radius: 6px; color: var(--n1); font-size: 0.8rem; font-weight: 700; cursor: pointer; padding: 4px 10px; transition: background 0.15s; flex-shrink: 0; }
     .btn-delete:hover { background: #fce8ea; }
-    .admin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 500px) { .admin-form { grid-template-columns: 1fr; } }
+    .admin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 560px) { .admin-form { grid-template-columns: 1fr; } }
     .form-group { display: flex; flex-direction: column; gap: 4px; }
     .form-group.full { grid-column: 1 / -1; }
     .form-group label { font-size: 0.8rem; font-weight: 700; color: var(--ink2); letter-spacing: 0.04em; text-transform: uppercase; }
@@ -143,13 +184,16 @@
 
     <p class="section-label">Lärappar</p>
     <div class="app-grid" id="grid-larappar">
-      <div class="loading-msg" id="loading-larappar">Laddar appar…</div>
-      
-          <!-- KOMMANDE -->
-      <div class="app-card coming-soon" data-levels="niva1 niva2 niva3">
+      <!-- Laddningsindikator -->
+      <div class="loading-wrap" id="loading-wrap">
+        <div class="spinner"></div>
+        <p>Laddar appar…</p>
+      </div>
+      <!-- KOMMANDE -->
+      <div class="app-card coming-soon" data-levels="niva1 niva2 niva3" style="border: 3px solid #ccc;">
         <div class="app-card-body">
           <div class="app-card-top">
-            <div class="app-icon coming">🔮</div>
+            <div class="app-icon coming" style="background:#f0f0f0;">🔮</div>
             <div class="app-meta">
               <div class="app-name">Kommande</div>
               <span class="app-badge badge-coming">Snart</span>
@@ -158,7 +202,7 @@
           <p class="app-desc">Nästa app är på väg. Håll utkik – fler interaktiva verktyg för svenska är under utveckling.</p>
         </div>
         <div class="app-actions">
-          <span class="btn-disabled">Kommer snart</span>
+          <span class="btn-coming">Kommer snart</span>
         </div>
       </div>
       
@@ -181,46 +225,78 @@
     <span id="footer-trigger">Vibekodad med Claude (Anthropic)</span>
   </footer>
 
+  <!-- ADMIN-INLOGGNING -->
+  <div class="admin-login-overlay" id="adminLoginOverlay">
+    <div class="admin-login-header">
+      <span class="header-title">Adams apphörna</span>
+      <div class="header-divider"></div>
+      <span class="header-sub">Adminvy</span>
+    </div>
+    <div class="admin-login-main">
+      <div class="admin-login-card">
+        <h2>Adminpanel</h2>
+        <p>Ange lösenordet för att hantera appar i apphörnan.</p>
+        <div class="admin-login-error" id="adminLoginError">Fel lösenord. Försök igen.</div>
+        <input type="password" class="admin-login-input" id="adminPwInput" placeholder="Lösenord"
+               onkeydown="if(event.key==='Enter') doAdminLogin()" />
+        <button class="admin-login-btn" onclick="doAdminLogin()">Logga in</button>
+        <button class="admin-login-cancel" onclick="closeAdminLogin()">Avbryt</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ADMIN-PANEL -->
   <div class="admin-overlay" id="adminOverlay">
-    <div class="admin-panel">
-      <div class="admin-header">
-        <h2>⚙️ Hantera appar</h2>
-        <button class="admin-close" onclick="closeAdmin()">✕</button>
-      </div>
-      <div class="admin-body">
-        <div class="admin-divider">Befintliga appar</div>
-        <div class="admin-app-list" id="adminAppList"></div>
-        <div class="admin-divider">Lägg till ny app</div>
-        <div class="admin-form">
-          <div class="form-group">
-            <label>Namn</label>
-            <input type="text" id="f-name" placeholder="t.ex. Ordjakten" />
+    <div class="admin-panel-header">
+      <span class="header-title">Adams apphörna</span>
+      <div class="header-divider"></div>
+      <span class="header-sub">Hantera appar</span>
+      <button class="admin-close" onclick="closeAdmin()">✕</button>
+    </div>
+    <div class="admin-panel-main">
+      <div class="admin-panel">
+        <div class="admin-panel-inner">
+          <div class="admin-divider">Befintliga appar</div>
+          <div class="admin-app-list" id="adminAppList"></div>
+          <div class="admin-divider">Lägg till ny app</div>
+          <div class="admin-form">
+            <div class="form-group">
+              <label>Namn</label>
+              <input type="text" id="f-name" placeholder="t.ex. Ordjakten" />
+            </div>
+            <div class="form-group emoji-picker-wrap">
+              <label>Ikon (emoji)</label>
+              <button type="button" class="emoji-trigger" id="emoji-trigger" onclick="toggleEmojiPanel(event)">
+                <span id="emoji-preview">📱</span>
+                <span class="trigger-label">Välj emoji</span>
+              </button>
+              <input type="hidden" id="f-icon" value="📱" />
+              <div class="emoji-panel" id="emoji-panel">
+                <div class="emoji-cats" id="emoji-cats"></div>
+                <div class="emoji-grid" id="emoji-grid"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Länk (href)</label>
+              <input type="text" id="f-href" placeholder="t.ex. ordjakten.html" />
+            </div>
+            <div class="form-group">
+              <label>Nivå / Kategori</label>
+              <select id="f-level">
+                <option value="niva1 niva2 niva3">Alla nivåer</option>
+                <option value="niva1">Nivå 1</option>
+                <option value="niva2">Nivå 2</option>
+                <option value="niva3">Nivå 3</option>
+                <option value="ovrigt">Övrigt</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>Beskrivning</label>
+              <input type="text" id="f-desc" placeholder="Kort beskrivning av appen" />
+            </div>
+            <button class="btn-add" id="btn-add" onclick="addApp()">+ Lägg till app</button>
+            <div class="admin-toast" id="adminToast"></div>
           </div>
-          <div class="form-group">
-            <label>Ikon (emoji)</label>
-            <input type="text" id="f-icon" placeholder="t.ex. 🔍" maxlength="4" />
-          </div>
-          <div class="form-group">
-            <label>Länk (href)</label>
-            <input type="text" id="f-href" placeholder="t.ex. ordjakten.html" />
-          </div>
-          <div class="form-group">
-            <label>Nivå / Kategori</label>
-            <select id="f-level">
-              <option value="niva1 niva2 niva3">Alla nivåer</option>
-              <option value="niva1">Nivå 1</option>
-              <option value="niva2">Nivå 2</option>
-              <option value="niva3">Nivå 3</option>
-              <option value="ovrigt">Övrigt</option>
-            </select>
-          </div>
-          <div class="form-group full">
-            <label>Beskrivning</label>
-            <input type="text" id="f-desc" placeholder="Kort beskrivning av appen" />
-          </div>
-          <button class="btn-add" id="btn-add" onclick="addApp()">+ Lägg till app</button>
-          <div class="admin-toast" id="adminToast"></div>
         </div>
       </div>
     </div>
@@ -290,19 +366,30 @@
 
     // ── Rendera alla kort ──
     function renderApps(apps) {
-      const larappar = document.getElementById("grid-larappar");
-      const ovrigt   = document.getElementById("grid-ovrigt");
-      const ovrigtLabel = document.getElementById("label-ovrigt");
+      var larappar    = document.getElementById("grid-larappar");
+      var ovrigt      = document.getElementById("grid-ovrigt");
+      var ovrigtLabel = document.getElementById("label-ovrigt");
 
-      larappar.innerHTML = "";
-      ovrigt.innerHTML   = "";
+      // Dölj spinner
+      var loadingWrap = document.getElementById("loading-wrap");
+      if (loadingWrap) loadingWrap.style.display = "none";
+
+      // Ta bort gamla dynamiska kort men behåll det statiska "Kommande"-kortet
+      larappar.querySelectorAll(".app-card:not(.coming-soon)").forEach(function(c) { c.remove(); });
+      ovrigt.innerHTML = "";
 
       apps.forEach(function(app) {
         var card = buildCard(app);
         if (app.level === "ovrigt") {
           ovrigt.appendChild(card);
         } else {
-          larappar.appendChild(card);
+          // Infoga före det statiska "Kommande"-kortet
+          var coming = larappar.querySelector(".coming-soon");
+          if (coming) {
+            larappar.insertBefore(card, coming);
+          } else {
+            larappar.appendChild(card);
+          }
         }
       });
 
@@ -358,7 +445,8 @@
         var data = await res.json();
         if (data.success) {
           document.getElementById("f-name").value = "";
-          document.getElementById("f-icon").value = "";
+          document.getElementById("f-icon").value = "📱";
+          document.getElementById("emoji-preview").textContent = "📱";
           document.getElementById("f-href").value = "";
           document.getElementById("f-desc").value = "";
           var apps = await fetchApps();
@@ -410,9 +498,33 @@
 
     // ── Admin öppna/stäng ──
     function closeAdmin() { document.getElementById("adminOverlay").classList.remove("open"); }
-    document.getElementById("adminOverlay").addEventListener("click", function(e) {
-      if (e.target === this) closeAdmin();
-    });
+
+    // ── Admin-inloggning ──
+    function doAdminLogin() {
+      var pw = document.getElementById("adminPwInput").value;
+      if (pw === "vänligkvartersspindel") {
+        closeAdminLogin();
+        document.getElementById("adminPwInput").value = "";
+        document.getElementById("adminLoginError").style.display = "none";
+        fetchApps().then(function(apps) {
+          renderAdminList(apps);
+          document.getElementById("adminOverlay").classList.add("open");
+        });
+      } else {
+        document.getElementById("adminLoginError").style.display = "block";
+        document.getElementById("adminPwInput").value = "";
+        document.getElementById("adminPwInput").focus();
+      }
+    }
+    function openAdminLogin() {
+      document.getElementById("adminLoginError").style.display = "none";
+      document.getElementById("adminPwInput").value = "";
+      document.getElementById("adminLoginOverlay").classList.add("open");
+      setTimeout(function() { document.getElementById("adminPwInput").focus(); }, 50);
+    }
+    function closeAdminLogin() {
+      document.getElementById("adminLoginOverlay").classList.remove("open");
+    }
 
     // ── Trippelklick på footer ──
     var clickCount = 0, clickTimer;
@@ -422,15 +534,7 @@
       clickTimer = setTimeout(function() { clickCount = 0; }, 600);
       if (clickCount >= 3) {
         clickCount = 0;
-        var pw = prompt("Lösenord:");
-        if (pw === "vänligkvartersspindel") {
-          fetchApps().then(function(apps) {
-            renderAdminList(apps);
-            document.getElementById("adminOverlay").classList.add("open");
-          });
-        } else if (pw !== null) {
-          alert("Fel lösenord.");
-        }
+        openAdminLogin();
       }
     });
 
@@ -459,7 +563,12 @@
         btn.classList.add("active");
         var filter = btn.dataset.filter;
         document.querySelectorAll("#grid-larappar .app-card").forEach(function(card) {
-          card.classList.toggle("hidden", filter !== "alla" && !card.dataset.levels.includes(filter));
+          // Det statiska "Kommande"-kortet visas alltid
+          if (card.classList.contains("coming-soon")) {
+            card.classList.remove("hidden");
+          } else {
+            card.classList.toggle("hidden", filter !== "alla" && !card.dataset.levels.includes(filter));
+          }
         });
         var hideOvrigt = filter !== "alla";
         document.getElementById("grid-ovrigt").style.display = hideOvrigt ? "none" : "";
@@ -471,8 +580,88 @@
     fetchApps().then(function(apps) {
       renderApps(apps);
     }).catch(function() {
-      document.getElementById("loading-larappar").textContent = "Kunde inte ladda appar. Kontrollera anslutningen.";
+      var loadingWrap = document.getElementById("loading-wrap");
+      if (loadingWrap) {
+        loadingWrap.innerHTML = '<p style="color:var(--n1);">Kunde inte ladda appar. Kontrollera anslutningen.</p>';
+      }
     });
+
+    // ── Emoji-väljare ──
+    var EMOJI_CATS = {
+      "📚 Svenska":  ["📖","✏️","📝","🖊️","📜","📕","📗","📘","📙","🔤","🔡","💬","🗣️","👄","📢","🔊","🎤","🎧","📡","🔭","🔬","🗒️","📋","📌","📎","🖇️","✂️","🖋️","📓","📔","📒","📃","🗞️","📰"],
+      "🎮 Spel":     ["🎮","🕹️","🏆","🥇","🥈","🥉","🎯","🎲","🃏","🎪","🎠","🎡","🎢","🎭","🎨","🖼️","🎬","📽️","🎞️","🎥","📹","🔮","🎰","🎳","🎻","🎸","🎺","🥁","🎷","🪗","🪕","🎹","🧩","🪀","🪁"],
+      "😀 Ansikten": ["😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🥳","🤩","😍","🤓","😎","🥸","🤔","🧐","😤","🤯","😱","😳","🥺","😭","😡","🤬","🤢","🤮","🥴","😵","🤠","🤡","👻","💀","👽","🤖","😈","👿","💩","🐵","🙈","🙉","🙊"],
+      "🌿 Natur":    ["🌱","🌿","🍀","🌳","🌲","🌾","🌻","🌸","🌺","🍁","🍂","🍃","🌍","🌈","☀️","🌙","⭐","❄️","🔥","💧","🌊","🌋","🏔️","🏝️","🏕️","🌄","🌅","🌠","🌌","🌪️","⛈️","🌩️","🦋","🐝","🐞","🦜","🦚","🌵","🌴","🌷","🌼","🌞","🌝"],
+      "🏫 Skola":    ["🏫","🏠","🏡","🏢","🏛️","⚗️","🔬","🔭","💡","🔋","💻","🖥️","🖨️","⌨️","🖱️","📱","☎️","📞","📟","📠","🔑","🗝️","🔒","🔓","📐","📏","🖇️","📌","📍","🗑️","🔧","🔨","⚙️","🧪","🧫","🧬","📊","📈","📉","🗓️","📅","⏰","⌚","🧮"],
+      "❤️ Symboler": ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","💕","💞","💓","💗","💖","💘","💝","⭐","✨","🌟","💫","⚡","💥","🎊","🎉","🎀","🎁","🏅","🎖️","🎗️","🔴","🟠","🟡","🟢","🔵","🟣","⚫","⚪","🟥","🟧","🟨","🟩","🟦","🟪"],
+      "🍕 Mat":      ["🍕","🍔","🌮","🌯","🥗","🍜","🍝","🍣","🍱","🍛","🥘","🫕","🍲","🥙","🥪","🥨","🧀","🥚","🍳","🥞","🧇","🥓","🥩","🍗","🍖","🌭","🍟","🧆","🥜","🫘","🌰","🍞","🫓","🥐","🥖","🥨","🧁","🍰","🎂","🍮","🍯","🍫","🍬","🍭","☕","🍵","🧃","🥤","🍺","🫖"],
+      "✈️ Resor":    ["✈️","🚀","🛸","🛩️","🚁","🚂","🚃","🚄","🚅","🚆","🚇","🚈","🚉","🚊","🚝","🚞","🚋","🚌","🚍","🚎","🚐","🚑","🚒","🚓","🚔","🚕","🚖","🚗","🚘","🚙","🛻","🚚","🛳️","⛴️","🚢","⛵","🛶","🚤","🛥️","🛟","🚀","🛸","🏎️","🏍️","🛵","🛺","🚲","🛴","🛹","🛼"]
+    };
+
+    var currentCat = Object.keys(EMOJI_CATS)[0];
+
+    function buildEmojiPicker() {
+      var catsEl = document.getElementById("emoji-cats");
+      var gridEl = document.getElementById("emoji-grid");
+      Object.keys(EMOJI_CATS).forEach(function(cat) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "emoji-cat-btn" + (cat === currentCat ? " active" : "");
+        btn.textContent = cat;
+        btn.onclick = function() {
+          currentCat = cat;
+          document.querySelectorAll(".emoji-cat-btn").forEach(function(b) { b.classList.remove("active"); });
+          btn.classList.add("active");
+          fillEmojiGrid(cat);
+        };
+        catsEl.appendChild(btn);
+      });
+      fillEmojiGrid(currentCat);
+    }
+
+    function fillEmojiGrid(cat) {
+      var gridEl = document.getElementById("emoji-grid");
+      gridEl.innerHTML = "";
+      EMOJI_CATS[cat].forEach(function(em) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "emoji-btn";
+        btn.textContent = em;
+        btn.onclick = function() {
+          document.getElementById("f-icon").value = em;
+          document.getElementById("emoji-preview").textContent = em;
+          document.getElementById("emoji-panel").classList.remove("open");
+        };
+        gridEl.appendChild(btn);
+      });
+    }
+
+    function toggleEmojiPanel(e) {
+      var panel = document.getElementById("emoji-panel");
+      if (panel.classList.contains("open")) {
+        panel.classList.remove("open");
+      } else {
+        var trigger = document.getElementById("emoji-trigger");
+        var rect = trigger.getBoundingClientRect();
+        panel.style.top = (rect.bottom + 6) + "px";
+        var left = rect.left;
+        if (left + 340 > window.innerWidth) { left = window.innerWidth - 350; }
+        if (left < 8) { left = 8; }
+        panel.style.left = left + "px";
+        panel.classList.add("open");
+      }
+      if (e) { e.stopPropagation(); }
+    }
+
+    // Stäng emoji-panel vid klick utanför
+    document.addEventListener("click", function(e) {
+      var wrap = document.querySelector(".emoji-picker-wrap");
+      if (wrap && !wrap.contains(e.target)) {
+        toggleEmojiPanel(false);
+      }
+    });
+
+    buildEmojiPicker();
   </script>
 
 </body>
