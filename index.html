@@ -103,58 +103,110 @@
     footer { background: var(--green-dark); color: rgba(255,255,255,0.7); font-size: 0.78rem; text-align: center; padding: 14px 16px; line-height: 1.7; }
     #footer-trigger { cursor: default; user-select: none; color: rgba(255,255,255,0.45); }
 
-    /* ══ ADMIN-INLOGGNING ══ */
-    .admin-login-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500; flex-direction: column; }
-    .admin-login-overlay.open { display: flex; }
-    .admin-login-header { background: var(--green); padding: 0 24px; display: flex; align-items: center; gap: 14px; height: 64px; flex-shrink: 0; }
-    .admin-login-header .header-title { font-family: "Bebas Neue", sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; line-height: 1; margin-top: 2px; }
-    .admin-login-header .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
-    .admin-login-header .header-sub { color: rgba(255,255,255,0.85); font-size: 0.88rem; font-weight: 500; }
-    .admin-login-main { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 48px 16px 64px; }
-    .admin-login-card { width: 100%; max-width: 400px; background: var(--card); border: 4px solid var(--green); border-radius: var(--radius); padding: 40px 36px; text-align: center; }
-    .admin-login-card h2 { font-family: "Bebas Neue", sans-serif; font-size: 1.8rem; letter-spacing: 0.05em; color: var(--ink); margin-bottom: 6px; }
-    .admin-login-card p { font-size: 0.88rem; color: var(--ink2); margin-bottom: 28px; line-height: 1.5; }
-    .admin-login-error { color: var(--n1); font-size: 0.85rem; margin-bottom: 12px; display: none; }
-    .admin-login-input { width: 100%; border: 1.5px solid var(--border); background: var(--bg); padding: 11px 14px; border-radius: 10px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; color: var(--ink); margin-bottom: 14px; outline: none; transition: border-color 0.15s; }
-    .admin-login-input:focus { border-color: var(--green); }
-    .admin-login-btn { width: 100%; border: none; background: var(--green); color: #fff; padding: 13px; border-radius: 50px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
-    .admin-login-btn:hover { opacity: 0.87; }
-    .admin-login-cancel { display: block; margin-top: 14px; font-size: 0.85rem; color: var(--ink2); cursor: pointer; background: none; border: none; font-family: "Source Sans 3", sans-serif; }
-    .admin-login-cancel:hover { color: var(--ink); text-decoration: underline; }
+   /* ══ ADMIN-INLOGGNING ══ */
+.admin-login-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 500;
+  flex-direction: column;
+}
 
-    /* ══ ADMIN-PANEL ══ */
-    .admin-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; flex-direction: column; }
-    .admin-overlay.open { display: flex; }
-    .admin-panel-header { background: var(--green-dark); padding: 0 24px; display: flex; align-items: center; gap: 14px; height: 64px; flex-shrink: 0; }
-    .admin-panel-header .header-title { font-family: "Bebas Neue", sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; line-height: 1; margin-top: 2px; }
-    .admin-panel-header .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
-    .admin-panel-header .header-sub { color: rgba(255,255,255,0.85); font-size: 0.88rem; font-weight: 500; flex: 1; }
-    .admin-close { background: none; border: none; color: rgba(255,255,255,0.8); font-size: 1.4rem; cursor: pointer; padding: 6px 10px; border-radius: 6px; transition: background 0.15s; margin-left: auto; }
-    .admin-close:hover { background: rgba(255,255,255,0.15); }
-    .admin-panel-main { flex: 1; overflow-y: visible; display: flex; justify-content: center; padding: 0; }
-    .admin-panel { background: none; border-radius: 0; width: 100%; max-width: none; overflow: hidden; border: none; }
-    .admin-panel-inner { padding: 28px 32px; }
-    .admin-divider { font-family: "Bebas Neue", sans-serif; font-size: 1rem; letter-spacing: 0.1em; color: var(--ink2); margin-bottom: 14px; padding-bottom: 6px; border-bottom: 2px solid var(--border); }
-    .admin-app-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
-    .admin-app-row { display: flex; align-items: center; gap: 12px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; }
-    .admin-app-row .row-icon { font-size: 1.4rem; flex-shrink: 0; }
-    .admin-app-row .row-info { flex: 1; min-width: 0; }
-    .admin-app-row .row-name { font-family: "Bebas Neue", sans-serif; font-size: 1.1rem; letter-spacing: 0.04em; color: var(--ink); }
-    .admin-app-row .row-meta { font-size: 0.78rem; color: var(--ink2); }
-    .admin-app-row .row-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .btn-delete { background: none; border: 1.5px solid #e0b0b4; border-radius: 6px; color: var(--n1); font-size: 0.8rem; font-weight: 700; cursor: pointer; padding: 4px 10px; transition: background 0.15s; flex-shrink: 0; }
-    .btn-delete:hover { background: #fce8ea; }
-    .admin-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media (max-width: 560px) { .admin-form { grid-template-columns: 1fr; } }
-    .form-group { display: flex; flex-direction: column; gap: 4px; }
-    .form-group.full { grid-column: 1 / -1; }
-    .form-group label { font-size: 0.8rem; font-weight: 700; color: var(--ink2); letter-spacing: 0.04em; text-transform: uppercase; }
-    .form-group input, .form-group select { background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 12px; font-family: "Source Sans 3", sans-serif; font-size: 0.92rem; color: var(--ink); outline: none; transition: border-color 0.15s; }
-    .form-group input:focus, .form-group select:focus { border-color: var(--green); }
-    .btn-add { grid-column: 1 / -1; background: var(--green); color: #fff; border: none; border-radius: 50px; padding: 11px 24px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.15s; margin-top: 4px; }
-    .btn-add:hover { background: var(--green-dark); }
-    .btn-add:disabled { background: #ccc; cursor: not-allowed; }
-    .admin-toast { display: none; border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; font-weight: 600; margin-top: 14px; grid-column: 1 / -1; }
+.admin-login-overlay.open { display: flex; }
+
+.admin-login-header {
+  background: var(--green);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 64px;
+}
+
+.admin-login-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  border: 3px solid var(--green);
+}
+
+/* ══ ADMIN-PANEL (NY LAYOUT) ══ */
+.admin-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 400;
+  flex-direction: column;
+}
+
+.admin-overlay.open { display: flex; }
+
+.admin-panel-header {
+  background: var(--green-dark);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  height: 64px;
+}
+
+.admin-panel-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.admin-panel {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.admin-panel-inner {
+  padding: 32px;
+}
+
+.admin-app-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-app-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.btn-delete {
+  border: 1px solid var(--n1);
+  color: var(--n1);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group.full { grid-column: 1 / -1; }
   </style>
 </head>
 <body>
@@ -225,82 +277,84 @@
     <span id="footer-trigger">Vibekodad med Claude (Anthropic)</span>
   </footer>
 
-  <!-- ADMIN-INLOGGNING -->
-  <div class="admin-login-overlay" id="adminLoginOverlay">
-    <div class="admin-login-header">
-      <span class="header-title">Adams apphörna</span>
-      <div class="header-divider"></div>
-      <span class="header-sub">Adminvy</span>
-    </div>
-    <div class="admin-login-main">
-      <div class="admin-login-card">
-        <h2>Adminpanel</h2>
-        <p>Ange lösenordet för att hantera appar i apphörnan.</p>
-        <div class="admin-login-error" id="adminLoginError">Fel lösenord. Försök igen.</div>
-        <input type="password" class="admin-login-input" id="adminPwInput" placeholder="Lösenord"
-               onkeydown="if(event.key==='Enter') doAdminLogin()" />
-        <button class="admin-login-btn" onclick="doAdminLogin()">Logga in</button>
-        <button class="admin-login-cancel" onclick="closeAdminLogin()">Avbryt</button>
-      </div>
-    </div>
+  <!-- ══ ADMIN-INLOGGNING ══ -->
+<div class="admin-login-overlay">
+  <div class="admin-login-header">
+    <span class="header-title">Admin</span>
+    <div class="header-divider"></div>
+    <span class="header-sub">Logga in</span>
   </div>
 
-  <!--  -->
-  <div class="admin-overlay" id="adminOverlay">
-    <div class="-header">
-      <span class="header-title">Adams apphörna</span>
-      <div class="header-divider"></div>
-      <span class="header-sub">Hantera appar</span>
-      <button class="admin-close" onclick="closeAdmin()">✕</button>
+  <div class="admin-login-main">
+    <div class="admin-login-card">
+      <h2>Adminpanel</h2>
+      <p>Skriv lösenord för att fortsätta.</p>
+
+      <div class="admin-login-error">Fel lösenord</div>
+
+      <input class="admin-login-input" type="password" placeholder="Lösenord">
+      <button class="admin-login-btn">Logga in</button>
+      <button class="admin-login-cancel">Avbryt</button>
     </div>
-    <div class="-main">
-      <div class="">
-        <div class="-inner">
-          <div class="admin-divider">Befintliga appar</div>
-          <div class="admin-app-list" id="adminAppList"></div>
-          <div class="admin-divider">Lägg till ny app</div>
-          <div class="admin-form">
-            <div class="form-group">
-              <label>Namn</label>
-              <input type="text" id="f-name" placeholder="t.ex. Ordjakten" />
-            </div>
-            <div class="form-group emoji-picker-wrap">
-              <label>Ikon (emoji)</label>
-              <button type="button" class="emoji-trigger" id="emoji-trigger" onclick="toggleEmojiPanel(event)">
-                <span id="emoji-preview">📱</span>
-                <span class="trigger-label">Välj emoji</span>
-              </button>
-              <input type="hidden" id="f-icon" value="📱" />
-              <div class="emoji-panel" id="emoji-panel">
-                <div class="emoji-cats" id="emoji-cats"></div>
-                <div class="emoji-grid" id="emoji-grid"></div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Länk (href)</label>
-              <input type="text" id="f-href" placeholder="t.ex. ordjakten.html" />
-            </div>
-            <div class="form-group">
-              <label>Nivå / Kategori</label>
-              <select id="f-level">
-                <option value="niva1 niva2 niva3">Alla nivåer</option>
-                <option value="niva1">Nivå 1</option>
-                <option value="niva2">Nivå 2</option>
-                <option value="niva3">Nivå 3</option>
-                <option value="ovrigt">Övrigt</option>
-              </select>
-            </div>
-            <div class="form-group full">
-              <label>Beskrivning</label>
-              <input type="text" id="f-desc" placeholder="Kort beskrivning av appen" />
-            </div>
-            <button class="btn-add" id="btn-add" onclick="addApp()">+ Lägg till app</button>
-            <div class="admin-toast" id="adminToast"></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN-PANEL ══ -->
+<div class="admin-overlay">
+  <div class="admin-panel-header">
+    <span class="header-title">Adminpanel</span>
+    <div class="header-divider"></div>
+    <span class="header-sub">Hantera appar</span>
+    <button class="admin-close">✕</button>
+  </div>
+
+  <div class="admin-panel-main">
+    <div class="admin-panel">
+      <div class="admin-panel-inner">
+
+        <h3 class="admin-divider">Befintliga appar</h3>
+        <div class="admin-app-list"></div>
+
+        <h3 class="admin-divider">Lägg till ny app</h3>
+        <form class="admin-form">
+          <div class="form-group">
+            <label>Namn</label>
+            <input type="text" class="input-name">
           </div>
-        </div>
+
+          <div class="form-group">
+            <label>Emoji</label>
+            <input type="text" class="input-emoji">
+          </div>
+
+          <div class="form-group">
+            <label>Nivå</label>
+            <select class="input-level">
+              <option value="alla">Alla</option>
+              <option value="niva1">Nivå 1</option>
+              <option value="niva2">Nivå 2</option>
+              <option value="niva3">Nivå 3</option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label>Beskrivning</label>
+            <input type="text" class="input-desc">
+          </div>
+
+          <div class="form-group full">
+            <label>Länk</label>
+            <input type="text" class="input-link">
+          </div>
+
+          <button class="btn-add">Lägg till app</button>
+          <div class="admin-toast"></div>
+        </form>
+
       </div>
     </div>
   </div>
+</div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfyxrM1WCiq1BmTztkBVJmVXqLY_X71v6qMUtMUNLmOzkXJQ5bSspSSM9qYguJ04t4Tg/exec";
