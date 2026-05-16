@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poängtavla</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #21262d;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --accent-1: #58a6ff;
+    --accent-2: #3fb950;
+    --accent-3: #f78166;
+    --accent-4: #e3b341;
+    --score-font: 'Bebas Neue', sans-serif;
+    --ui-font: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ui-font);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2vw 1vw;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2vw;
+  }
+
+  header h1 {
+    font-family: var(--score-font);
+    font-size: clamp(2.8rem, 7vw, 99rem);
+    letter-spacing: 0.2em;
+    color: var(--text);
+    text-shadow: 0 0 60px rgba(230,237,243,0.12);
+  }
+
+  header p { display: none; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25vw;
+    width: 100%;
+    width: 100%;
+  }
+
+  .team {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .team::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--team-color);
+    border-radius: 12px 12px 0 0;
+  }
+
+  .team.scored {
+    animation: flash 0.45s ease-out;
+  }
+
+  @keyframes flash {
+    0%   { background: var(--surface); }
+    30%  { background: color-mix(in srgb, var(--team-color) 18%, var(--surface)); }
+    100% { background: var(--surface); }
+  }
+
+  .team-1 { --team-color: var(--accent-1); }
+  .team-2 { --team-color: var(--accent-2); }
+  .team-3 { --team-color: var(--accent-3); }
+  .team-4 { --team-color: var(--accent-4); }
+
+  .team-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--team-color);
+    letter-spacing: 0.05em;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    font-family: var(--ui-font);
+    outline: none;
+    transition: opacity 0.2s;
+  }
+
+  .team-name:focus {
+    border-bottom: 1px solid var(--team-color);
+    opacity: 1;
+  }
+
+  .score {
+    font-family: var(--score-font);
+    font-size: clamp(5rem, 16vw, 99rem);
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    min-width: 3ch;
+    text-align: center;
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .score.bump {
+    transform: scale(1.18);
+  }
+
+  .controls {
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 0.75rem 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text);
+    font-size: 1.4rem;
+    font-weight: 300;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    font-family: var(--ui-font);
+    line-height: 1;
+  }
+
+  .btn-plus {
+    border-color: color-mix(in srgb, var(--team-color) 40%, transparent);
+    color: var(--team-color);
+  }
+
+  .btn-plus:hover {
+    background: color-mix(in srgb, var(--team-color) 15%, transparent);
+    border-color: var(--team-color);
+  }
+
+  .btn-minus:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--muted);
+  }
+
+  footer {
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .reset-btn, .fullscreen-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.5rem 1.4rem;
+    border-radius: 6px;
+    font-family: var(--ui-font);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .reset-btn:hover {
+    border-color: var(--accent-3);
+    color: var(--accent-3);
+  }
+
+  .fullscreen-btn:hover {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+  }
+
+  @media (max-width: 600px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+    .score { font-size: clamp(4rem, 18vw, 7rem); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>POÄNGTAVLA</h1>
+  <p>Klicka på lagnamnet för att byta det</p>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<footer>
+  <button class="reset-btn" onclick="resetAll()">↺ Återställ</button>
+  <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Helskärm</button>
+</footer>
+
+<script>
+  const defaults = ['Lag 1', 'Lag 2', 'Lag 3', 'Lag 4'];
+  const classes = ['team-1','team-2','team-3','team-4'];
+  let scores = [0, 0, 0, 0];
+  let names = [...defaults];
+
+  function render() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    scores.forEach((score, i) => {
+      const team = document.createElement('div');
+      team.className = `team ${classes[i]}`;
+      team.id = `team-${i}`;
+      team.innerHTML = `
+        <input class="team-name" value="${names[i]}" 
+          onchange="names[${i}]=this.value"
+          onclick="this.select()"
+          maxlength="24"
+        />
+        <div class="score" id="score-${i}">${score}</div>
+        <div class="controls">
+          <button class="btn btn-minus" onclick="change(${i}, -1)">−</button>
+          <button class="btn btn-plus" id="plus-${i}" onclick="handleClick(${i})">+</button>
+        </div>
+      `;
+      grid.appendChild(team);
+    });
+  }
+
+  const clickTimers = {};
+
+  function handleClick(i) {
+    if (clickTimers[i]) {
+      clearTimeout(clickTimers[i]);
+      delete clickTimers[i];
+      change(i, 5);
+    } else {
+      clickTimers[i] = setTimeout(() => {
+        delete clickTimers[i];
+        change(i, 1);
+      }, 250);
+    }
+  }
+
+  function change(i, delta) {
+    scores[i] = Math.max(0, scores[i] + delta);
+    const scoreEl = document.getElementById(`score-${i}`);
+    const teamEl = document.getElementById(`team-${i}`);
+    scoreEl.textContent = scores[i];
+    if (delta > 0) {
+      scoreEl.classList.remove('bump');
+      void scoreEl.offsetWidth;
+      scoreEl.classList.add('bump');
+      teamEl.classList.remove('scored');
+      void teamEl.offsetWidth;
+      teamEl.classList.add('scored');
+      setTimeout(() => { scoreEl.classList.remove('bump'); }, 200);
+      setTimeout(() => { teamEl.classList.remove('scored'); }, 500);
+    }
+  }
+
+  function resetAll() {
+    scores = [0, 0, 0, 0];
+    render();
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  render();
+</script>
+</body>
+</html>
