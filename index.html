@@ -107,29 +107,29 @@
     #footer-trigger:hover { color: rgba(255,255,255,0.8); }
 
     /* ══ ADMIN-INLOGGNING ══ */
-    .admin-login-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 500; flex-direction: column; }
+    /* ── MODAL LOGIN (same style as Buzzer/Poangtavla) ── */
+    .admin-login-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; align-items: center; justify-content: center; padding: 16px; }
     .admin-login-overlay.open { display: flex; }
-    .admin-login-header { background: var(--green); padding: 0 24px; display: flex; align-items: center; gap: 14px; height: 64px; flex-shrink: 0; }
-    .admin-login-header .header-title { font-family: "Bebas Neue", sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; line-height: 1; margin-top: 2px; }
-    .admin-login-header .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
-    .admin-login-header .header-sub { color: rgba(255,255,255,0.85); font-size: 0.88rem; font-weight: 500; }
-    .admin-login-main { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 48px 16px 64px; }
-    .admin-login-card { width: 100%; max-width: 400px; background: var(--card); border: 4px solid var(--green); border-radius: var(--radius); padding: 40px 36px; text-align: center; }
-    .admin-login-card h2 { font-family: "Bebas Neue", sans-serif; font-size: 1.8rem; letter-spacing: 0.05em; color: var(--ink); margin-bottom: 6px; }
-    .admin-login-card p { font-size: 0.88rem; color: var(--ink2); margin-bottom: 28px; line-height: 1.5; }
-    .admin-login-error { color: var(--n1); font-size: 0.85rem; margin-bottom: 12px; display: none; font-weight: 600; }
-    .admin-login-input { width: 100%; border: 1.5px solid var(--border); background: var(--bg); padding: 11px 14px; border-radius: 10px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; transition: border-color 0.15s; }
+    .admin-login-header { display: none; } /* header not used in modal mode */
+    .admin-login-main { width: 100%; max-width: 420px; }
+    .admin-login-card { background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--border); padding: 28px 24px; }
+    .admin-login-card h2 { font-family: "Bebas Neue", sans-serif; font-size: 1.6rem; letter-spacing: 0.15em; color: var(--green); margin-bottom: 6px; }
+    .admin-login-card p { font-size: 0.9rem; color: var(--ink2); margin-bottom: 20px; line-height: 1.5; }
+    .admin-login-error { color: #c0392b; font-size: 0.85rem; margin-bottom: 10px; display: none; font-weight: 600; }
+    .admin-login-input { width: 100%; border: 1.5px solid var(--border); background: var(--bg); padding: 10px 14px; border-radius: 10px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; transition: border-color 0.15s; margin-bottom: 12px; }
     .admin-login-input:focus { border-color: var(--green); outline: none; }
-    .admin-login-btn { width: 100%; border: none; background: var(--green); color: #fff; padding: 13px; border-radius: 50px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; margin-top: 14px; }
+    .admin-login-btn { width: 100%; border: none; background: var(--green); color: #fff; padding: 11px 24px; border-radius: 50px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: opacity 0.15s; }
     .admin-login-btn:hover { opacity: 0.87; }
     .admin-login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .admin-login-cancel { display: block; margin-top: 14px; font-size: 0.85rem; color: var(--ink2); cursor: pointer; background: none; border: none; font-family: "Source Sans 3", sans-serif; transition: all 0.15s; }
-    .admin-login-cancel:hover { color: var(--ink); text-decoration: underline; }
+    .admin-login-cancel { display: block; margin-top: 10px; width: 100%; background: none; color: var(--ink2); border: 1.5px solid var(--border); padding: 9px 20px; border-radius: 50px; font-family: "Source Sans 3", sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+    .admin-login-cancel:hover { border-color: var(--green); color: var(--green); }
+    /* modal-btns row */
+    .modal-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
 
     /* ══ ADMIN-PANEL ══ */
     .admin-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 200; flex-direction: column; }
     .admin-overlay.open { display: flex; }
-    .admin-panel-header { background: var(--green-dark); padding: 0 24px; display: flex; align-items: center; gap: 14px; height: 64px; flex-shrink: 0; }
+    .admin-panel-header { background: var(--green); padding: 0 24px; display: flex; align-items: center; gap: 14px; height: 64px; flex-shrink: 0; }
     .admin-panel-header .header-title { font-family: "Bebas Neue", sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; line-height: 1; margin-top: 2px; }
     .admin-panel-header .header-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.3); }
     .admin-panel-header .header-sub { color: rgba(255,255,255,0.85); font-size: 0.88rem; font-weight: 500; flex: 1; }
@@ -171,6 +171,42 @@
     .btn-cancel { width: 100%; background: none; color: var(--ink2); border: 1.5px solid var(--border); border-radius: 50px; padding: 9px 24px; font-family: "Source Sans 3", sans-serif; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-top: 6px; }
     .btn-cancel:hover { border-color: var(--n1); color: var(--n1); }
     .admin-toast { display: none; border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; font-weight: 600; margin-top: 10px; }
+    /* Global update toast */
+    #global-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 18px;
+      font-size: 0.88rem;
+      color: var(--ink2);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 9999;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
+      max-width: 320px;
+    }
+    #global-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -257,14 +293,14 @@
     <div class="admin-login-header">
       <span class="header-title">Adams apphörna</span>
       <div class="header-divider" aria-hidden="true"></div>
-      <span class="header-sub">Adminvy</span>
+      <span class="header-sub">Lärarvy</span>
     </div>
     <div class="admin-login-main">
       <div class="admin-login-card">
-        <h2 id="admin-login-title">Adminpanel</h2>
-        <p>Ange lösenordet för att hantera appar i apphörnan.</p>
+        <h2 id="admin-login-title">Lärarpanel</h2>
+        <p>Ange lösenordet för att öppna lärarvyn.</p>
         <div class="admin-login-error" id="adminLoginError" role="alert">Fel lösenord. Försök igen.</div>
-        <input type="password" class="admin-login-input" id="adminPwInput" placeholder="Lösenord" aria-label="Admin-lösenord"
+        <input type="password" class="admin-login-input" id="adminPwInput" placeholder="Lösenord" aria-label="Lärar-lösenord"
                onkeydown="if(event.key==='Enter') doAdminLogin()" />
         <button class="admin-login-btn" onclick="doAdminLogin()">Logga in</button>
         <button class="admin-login-cancel" onclick="closeAdminLogin()">Avbryt</button>
@@ -277,7 +313,7 @@
     <div class="admin-panel-header">
       <span class="header-title">Adams apphörna</span>
       <div class="header-divider" aria-hidden="true"></div>
-      <span class="header-sub">Hantera appar</span>
+      <span class="header-sub">Lärarvy – Hantera appar</span>
       <button class="admin-close" onclick="closeAdmin()" aria-label="Stäng adminpanel">✕</button>
     </div>
     <div class="admin-panel-main">
@@ -535,16 +571,20 @@
       btn.disabled = true;
       btn.textContent = currentEditingIndex !== null ? "Uppdaterar…" : "Sparar…";
 
+      const wasEditing = currentEditingIndex !== null;
+      // Show global toast while working
+      showGlobalToast(wasEditing ? "Uppdaterar app…" : "Sparar app…", true);
+
       try {
-        const action = currentEditingIndex !== null ? "updateApp" : "addApp";
-        const body = currentEditingIndex !== null 
+        const action = wasEditing ? "updateApp" : "addApp";
+        const body = wasEditing
           ? { action, index: currentEditingIndex, name, icon, href, level, desc }
           : { action, name, icon, href, level, desc };
 
         const res = await fetchWithTimeout(SCRIPT_URL, {
           method: "POST",
           body: JSON.stringify(body)
-        });
+        }, 15000);
         const data = await res.json();
         if (data.success) {
           document.getElementById("f-name").value = "";
@@ -558,16 +598,23 @@
           btn.textContent = "+ Lägg till app";
           const cancelBtn = document.querySelector(".btn-cancel");
           if (cancelBtn) cancelBtn.style.display = "none";
-          
+          document.getElementById("adminFormTitle").textContent = "Lägg till app";
+
+          // Show working toast, then reload and show done
+          showGlobalToast("Hämtar uppdaterade appar…", true);
           const apps = await fetchApps();
           renderApps(apps);
           renderAdminList(apps);
-          showToast("✓ " + escapeHtml(name) + (data.updated ? " uppdaterad!" : " lades till!"), true);
+          hideGlobalToast();
+          showGlobalToast("✓ " + escapeHtml(name) + (wasEditing ? " uppdaterad!" : " lades till!"), false);
+          showToast("✓ " + escapeHtml(name) + (wasEditing ? " uppdaterad!" : " lades till!"), true);
         } else {
+          hideGlobalToast();
           showToast("Något gick fel. Försök igen.", false);
         }
       } catch (e) {
         console.error("Error:", e);
+        hideGlobalToast();
         showToast("Kunde inte nå Google Sheets.", false);
       }
 
@@ -577,22 +624,28 @@
 
     async function deleteApp(index) {
       if (!confirm("Ta bort denna app?")) return;
+      showGlobalToast("Tar bort app…", true);
       try {
         const res = await fetchWithTimeout(SCRIPT_URL, {
           method: "POST",
           body: JSON.stringify({ action: "deleteApp", index })
-        });
+        }, 15000);
         const data = await res.json();
         if (data.success) {
+          showGlobalToast("Hämtar uppdaterade appar…", true);
           const apps = await fetchApps();
           renderApps(apps);
           renderAdminList(apps);
+          hideGlobalToast();
+          showGlobalToast("✓ App borttagen.", false);
           showToast("App borttagen.", true);
         } else {
+          hideGlobalToast();
           showToast("Något gick fel.", false);
         }
       } catch (e) {
         console.error("Error deleting app:", e);
+        hideGlobalToast();
         showToast("Kunde inte nå Google Sheets.", false);
       }
     }
@@ -828,8 +881,34 @@
       }
     });
 
+    // ── Global toast helpers ──
+    let globalToastTimer = null;
+    function showGlobalToast(msg, spinning) {
+      const toast = document.getElementById('global-toast');
+      const spinner = document.getElementById('toast-spinner');
+      const msgEl = document.getElementById('toast-msg');
+      msgEl.textContent = msg;
+      spinner.style.display = spinning ? 'block' : 'none';
+      toast.classList.add('show');
+      if (globalToastTimer) clearTimeout(globalToastTimer);
+      if (!spinning) {
+        globalToastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
+      }
+    }
+    function hideGlobalToast() {
+      const toast = document.getElementById('global-toast');
+      toast.classList.remove('show');
+      if (globalToastTimer) clearTimeout(globalToastTimer);
+    }
+
     buildEmojiPicker();
   </script>
+
+  <!-- GLOBAL UPDATE TOAST -->
+  <div id="global-toast">
+    <div class="toast-spinner" id="toast-spinner"></div>
+    <span id="toast-msg">Uppdaterar appar…</span>
+  </div>
 
 </body>
 </html>
