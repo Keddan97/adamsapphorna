@@ -153,9 +153,7 @@
     .admin-app-row .row-meta { font-size: 0.75rem; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .admin-app-row .row-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .admin-app-row .row-actions { display: flex; gap: 6px; flex-shrink: 0; }
-    .btn-delete, .btn-edit { border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; padding: 5px 10px; transition: all 0.15s; border: 1.5px solid; white-space: nowrap; }
-    .btn-edit { border-color: var(--green); color: var(--green); background: none; }
-    .btn-edit:hover { background: var(--green-pale); }
+    .btn-delete { border-radius: 6px; font-size: 0.78rem; font-weight: 700; cursor: pointer; padding: 5px 10px; transition: all 0.15s; border: 1.5px solid; white-space: nowrap; }
     .btn-delete { border-color: #e0b0b4; color: var(--n1); background: none; }
     .btn-delete:hover { background: #fce8ea; }
 
@@ -168,8 +166,6 @@
     .btn-add { width: 100%; background: var(--green); color: #fff; border: none; border-radius: 50px; padding: 11px 24px; font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.15s; margin-top: 4px; }
     .btn-add:hover { background: var(--green-dark); }
     .btn-add:disabled { background: #ccc; cursor: not-allowed; opacity: 0.7; }
-    .btn-cancel { width: 100%; background: none; color: var(--ink2); border: 1.5px solid var(--border); border-radius: 50px; padding: 9px 24px; font-family: "Source Sans 3", sans-serif; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-top: 6px; }
-    .btn-cancel:hover { border-color: var(--n1); color: var(--n1); }
     .admin-toast { display: none; border-radius: 8px; padding: 10px 14px; font-size: 0.88rem; font-weight: 600; margin-top: 10px; }
     /* Global update toast */
     #global-toast {
@@ -374,7 +370,6 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfyxrM1WCiq1BmTztkBVJmVXqLY_X71v6qMUtMUNLmOzkXJQ5bSspSSM9qYguJ04t4Tg/exec";
     const FETCH_TIMEOUT = 10000;
 
-    let currentEditingIndex = null;
     let currentEmojiTarget = null;
 
     const LEVEL_COLOR = {
@@ -499,13 +494,9 @@
           '</div>' +
           '<div class="row-dot" style="background:' + LEVEL_COLOR[app.level] + '" aria-hidden="true"></div>' +
           '<div class="row-actions">' +
-            '<button class="btn-edit" data-index="' + i + '">Redigera</button>' +
             '<button class="btn-delete" data-index="' + i + '">Ta bort</button>' +
           '</div>';
         
-        row.querySelector(".btn-edit").addEventListener("click", function() {
-          editApp(parseInt(this.dataset.index), apps);
-        });
         row.querySelector(".btn-delete").addEventListener("click", function() {
           deleteApp(parseInt(this.dataset.index));
         });
@@ -513,47 +504,7 @@
       });
     }
 
-    function editApp(index, apps) {
-      const app = apps[index];
-      currentEditingIndex = index;
-      
-      document.getElementById("f-name").value = app.name;
-      document.getElementById("f-icon").value = app.icon || "📱";
-      document.getElementById("emoji-preview-add").textContent = app.icon || "📱";
-      document.getElementById("f-href").value = app.href;
-      document.getElementById("f-level").value = app.level;
-      document.getElementById("f-desc").value = app.desc;
-      
-      document.getElementById("adminFormTitle").textContent = "Redigera app";
-      document.getElementById("btn-add").textContent = "Uppdatera app";
-      
-      let cancelBtn = document.getElementById("btn-cancel-edit");
-      if (!cancelBtn) {
-        cancelBtn = document.createElement("button");
-        cancelBtn.id = "btn-cancel-edit";
-        cancelBtn.className = "btn-cancel";
-        cancelBtn.textContent = "Avbryt redigering";
-        cancelBtn.onclick = cancelEdit;
-        document.getElementById("btn-add").insertAdjacentElement("afterend", cancelBtn);
-      }
-      cancelBtn.style.display = "block";
-    }
 
-    function cancelEdit() {
-      currentEditingIndex = null;
-      document.getElementById("f-name").value = "";
-      document.getElementById("f-icon").value = "📱";
-      document.getElementById("emoji-preview-add").textContent = "📱";
-      document.getElementById("f-href").value = "";
-      document.getElementById("f-level").value = "niva1 niva2 niva3";
-      document.getElementById("f-desc").value = "";
-      
-      document.getElementById("adminFormTitle").textContent = "Lägg till app";
-      document.getElementById("btn-add").textContent = "+ Lägg till app";
-      
-      const cancelBtn = document.getElementById("btn-cancel-edit");
-      if (cancelBtn) cancelBtn.style.display = "none";
-    }
 
     async function addApp() {
       const name = document.getElementById("f-name").value.trim();
@@ -569,21 +520,13 @@
 
       const btn = document.getElementById("btn-add");
       btn.disabled = true;
-      btn.textContent = currentEditingIndex !== null ? "Uppdaterar…" : "Sparar…";
-
-      const wasEditing = currentEditingIndex !== null;
-      // Show global toast while working
-      showGlobalToast(wasEditing ? "Uppdaterar app…" : "Sparar app…", true);
+      btn.textContent = "Sparar…";
+      showGlobalToast("Sparar app…", true);
 
       try {
-        const action = wasEditing ? "updateApp" : "addApp";
-        const body = wasEditing
-          ? { action, index: currentEditingIndex, name, icon, href, level, desc }
-          : { action, name, icon, href, level, desc };
-
         const res = await fetchWithTimeout(SCRIPT_URL, {
           method: "POST",
-          body: JSON.stringify(body)
+          body: JSON.stringify({ action: "addApp", name, icon, href, level, desc })
         }, 15000);
         const data = await res.json();
         if (data.success) {
@@ -593,21 +536,14 @@
           document.getElementById("f-href").value = "";
           document.getElementById("f-desc").value = "";
           document.getElementById("f-level").value = "niva1 niva2 niva3";
-          
-          currentEditingIndex = null;
-          btn.textContent = "+ Lägg till app";
-          const cancelBtn = document.querySelector(".btn-cancel");
-          if (cancelBtn) cancelBtn.style.display = "none";
-          document.getElementById("adminFormTitle").textContent = "Lägg till app";
 
-          // Show working toast, then reload and show done
           showGlobalToast("Hämtar uppdaterade appar…", true);
           const apps = await fetchApps();
           renderApps(apps);
           renderAdminList(apps);
           hideGlobalToast();
-          showGlobalToast("✓ " + escapeHtml(name) + (wasEditing ? " uppdaterad!" : " lades till!"), false);
-          showToast("✓ " + escapeHtml(name) + (wasEditing ? " uppdaterad!" : " lades till!"), true);
+          showGlobalToast("✓ " + escapeHtml(name) + " lades till!", false);
+          showToast("✓ " + escapeHtml(name) + " lades till!", true);
         } else {
           hideGlobalToast();
           showToast("Något gick fel. Försök igen.", false);
@@ -619,7 +555,7 @@
       }
 
       btn.disabled = false;
-      btn.textContent = currentEditingIndex !== null ? "Uppdatera app" : "+ Lägg till app";
+      btn.textContent = "+ Lägg till app";
     }
 
     async function deleteApp(index) {
