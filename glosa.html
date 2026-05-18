@@ -638,7 +638,7 @@ async function fetchWords(level) {
 
     const all = data.words || [];
     W = all
-      .filter(item => parseInt(item.difficulty) === level)
+      .filter(item => parseInt(item.difficulty) === level && item.wordClass !== '')
       .map(item => ({
         id:  item.id,
         w:   item.word        || '',
