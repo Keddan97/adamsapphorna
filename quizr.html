@@ -73,12 +73,15 @@
   .niva-rubrik { font-family:'Source Sans 3', sans-serif; font-weight:600; font-size:1.5rem; color:var(--ink); margin-bottom:4px; text-align:center; }
   .niva-ingress { font-size:0.9rem; color:var(--ink2); margin-bottom:16px; text-align:center; }
   .niva-btn {
-    width:100%; border:2px solid var(--border); background:var(--card);
+    width:100%; border:2px solid var(--border); background:transparent;
     padding:18px 24px; border-radius:var(--radius);
     font-family:'Source Sans 3',sans-serif; cursor:pointer; text-align:left;
     transition:border-color 0.15s, background 0.15s;
     display:flex; align-items:center; gap:16px;
   }
+  .niva-btn.n1 { background: linear-gradient(to right, #f7c5c9, #ffffff); border-color: var(--n1); }
+  .niva-btn.n2 { background: linear-gradient(to right, #d9c5e8, #ffffff); border-color: var(--n2); }
+  .niva-btn.n3 { background: linear-gradient(to right, #c5e8eb, #ffffff); border-color: var(--n3); }
   .niva-btn:hover { border-color:var(--green); background:var(--green-pale); }
   .niva-btn.challenge-btn:hover { border-color:var(--orange); background:var(--orange-pale); }
   .niva-badge {
@@ -384,7 +387,7 @@ function showNivaScreen() {
     const num=numMatch?numMatch[0]:(i+1);
     const bc=badgeClasses[i]||"n1";
     const label=n.toLowerCase().startsWith("nivå")?"Svenska "+n:n;
-    return `<button class="niva-btn" onclick="selectNiva('${n}')">
+    return `<button class="niva-btn ${bc}" onclick="selectNiva('${n}')">
       <div class="niva-badge ${bc}">${num}</div>
       <div class="niva-text-wrap">
         <span class="niva-name">${label}</span>
